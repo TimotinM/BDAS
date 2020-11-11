@@ -52,6 +52,7 @@ class Signup extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: Container(
+        child: Container(
           color: Colors.white,
           child: Padding(
             padding: const EdgeInsets.all(35.0),
@@ -81,6 +82,7 @@ class Signup extends StatelessWidget {
             ),
           ),
         ),
+      ),
       ),
     );
   }

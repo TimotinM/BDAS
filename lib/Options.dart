@@ -1,6 +1,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:untitled/ChangePassword.dart';
 
 class Options extends StatelessWidget{
   int sRadius = 10;
@@ -68,7 +69,15 @@ class Options extends StatelessWidget{
         child: ListTile(
           title: Text('Change Password'),
           trailing: Icon(Icons.keyboard_arrow_right),
-          onTap: () => print("pass"),
+          onTap: () {
+            Navigator
+                .push(
+                context,
+                MaterialPageRoute(
+                builder: (context) => ChangePassword()
+              )
+            );
+          },
           leading: Icon(IconData(58625, fontFamily: 'MaterialIcons')),
         ),
       );

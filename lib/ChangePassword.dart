@@ -1,7 +1,6 @@
-
 import 'package:flutter/material.dart';
 
-class Login extends StatelessWidget {
+class ChangePassword extends StatelessWidget {
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
 
   @override
@@ -12,7 +11,7 @@ class Login extends StatelessWidget {
       style: style,
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-          hintText: "Login",
+          hintText: "Current password",
           border:
           OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
     );
@@ -21,7 +20,16 @@ class Login extends StatelessWidget {
       style: style,
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-          hintText: "Password",
+          hintText: "New password",
+          border:
+          OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
+    );
+    final repeatPasswordField = TextField(
+      obscureText: true,
+      style: style,
+      decoration: InputDecoration(
+          contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+          hintText: "Confirm new password",
           border:
           OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
     );
@@ -32,8 +40,11 @@ class Login extends StatelessWidget {
       child: MaterialButton(
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-        onPressed: () {},
-        child: Text("Login",
+        onPressed: () {
+          Navigator
+              .pop(context);
+        },
+        child: Text("Save",
             textAlign: TextAlign.center,
             style: style.copyWith(
                 color: Colors.white, fontWeight: FontWeight.bold)),
@@ -42,8 +53,8 @@ class Login extends StatelessWidget {
 
     return Scaffold(
       body: Center(
+        child: SingleChildScrollView(
         child: Container(
-         child: Container(
           color: Colors.white,
           child: Padding(
             padding: const EdgeInsets.all(35.0),
@@ -62,9 +73,9 @@ class Login extends StatelessWidget {
                 emailField,
                 SizedBox(height: 25.0),
                 passwordField,
-                SizedBox(
-                  height: 35.0,
-                ),
+                SizedBox(height: 25.0,),
+                repeatPasswordField,
+                SizedBox(height: 35.0,),
                 loginButon,
                 SizedBox(
                   height: 15.0,

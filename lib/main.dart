@@ -3,6 +3,7 @@ import 'package:untitled/Signup.dart';
 import 'Options.dart';
 import 'Login.dart';
 import 'HomePage.dart';
+import 'ChangePassword.dart';
 
 void main() => runApp(MyApp());
 
