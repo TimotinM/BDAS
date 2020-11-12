@@ -2,6 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/ChangePassword.dart';
+import 'package:untitled/EditProfile.dart';
 
 class Options extends StatelessWidget{
   int sRadius = 10;
@@ -59,7 +60,15 @@ class Options extends StatelessWidget{
         child: ListTile(
           title: Text('Edit Profile'),
           trailing: Icon(Icons.keyboard_arrow_right),
-          onTap: () => print("profile"),
+          onTap: () {
+            Navigator
+                .push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => EditProfile()
+                )
+            );
+          },
           leading: Icon(IconData(57360, fontFamily: 'MaterialIcons')),
         ),
       );

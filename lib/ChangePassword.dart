@@ -6,8 +6,8 @@ class ChangePassword extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final emailField = TextField(
-      obscureText: false,
+    final curentPassword = TextField(
+      obscureText: true,
       style: style,
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
@@ -15,7 +15,7 @@ class ChangePassword extends StatelessWidget {
           border:
           OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
     );
-    final passwordField = TextField(
+    final newPassword = TextField(
       obscureText: true,
       style: style,
       decoration: InputDecoration(
@@ -24,7 +24,7 @@ class ChangePassword extends StatelessWidget {
           border:
           OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
     );
-    final repeatPasswordField = TextField(
+    final confirmNewPassword = TextField(
       obscureText: true,
       style: style,
       decoration: InputDecoration(
@@ -33,7 +33,7 @@ class ChangePassword extends StatelessWidget {
           border:
           OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
     );
-    final loginButon = Material(
+    final saveButon = Material(
       elevation: 5.0,
       borderRadius: BorderRadius.circular(30.0),
       color: Colors.black,
@@ -52,6 +52,25 @@ class ChangePassword extends StatelessWidget {
     );
 
     return Scaffold(
+
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        title: Center(
+            child: Text('Change Password', textAlign: TextAlign.center, style: TextStyle(color: Colors.white))
+        ),
+        leading: FlatButton(
+          textColor: Colors.white,
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            Navigator
+                .pop(context);
+          },
+        ),
+      ),
+
       body: Center(
         child: SingleChildScrollView(
         child: Container(
@@ -70,13 +89,13 @@ class ChangePassword extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 45.0),
-                emailField,
+                curentPassword,
                 SizedBox(height: 25.0),
-                passwordField,
+                newPassword,
                 SizedBox(height: 25.0,),
-                repeatPasswordField,
+                confirmNewPassword,
                 SizedBox(height: 35.0,),
-                loginButon,
+                saveButon,
                 SizedBox(
                   height: 15.0,
                 ),
