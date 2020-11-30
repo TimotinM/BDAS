@@ -1,7 +1,13 @@
 
 import 'package:flutter/material.dart';
+import 'package:untitled/Login.dart';
 
-class Signup extends StatelessWidget {
+class Signup extends StatefulWidget {
+  @override
+  _Signup createState() => _Signup();
+}
+
+class _Signup extends State<Signup> {
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
 
   @override
@@ -41,11 +47,27 @@ class Signup extends StatelessWidget {
       child: MaterialButton(
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-        onPressed: () {},
+        onPressed: () {
+
+        },
         child: Text("Singup",
             textAlign: TextAlign.center,
             style: style.copyWith(
                 color: Colors.white, fontWeight: FontWeight.bold)),
+      ),
+    );
+
+    final login =  FlatButton(
+      onPressed: () {
+        Navigator
+            .pop(context);
+      },
+      child: Text(
+        "Login",
+        style: TextStyle(
+          color: Colors.blue,
+          fontSize: 20,
+        ),
       ),
     );
 
@@ -75,9 +97,8 @@ class Signup extends StatelessWidget {
                 repeatPasswordField,
                 SizedBox(height: 35.0,),
                 loginButon,
-                SizedBox(
-                  height: 15.0,
-                ),
+                SizedBox(height: 15.0,),
+                login
               ],
             ),
           ),

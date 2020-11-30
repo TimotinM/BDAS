@@ -3,11 +3,17 @@ import 'package:flutter/material.dart';
 import 'dart:collection';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+class HomePage extends StatefulWidget {
+  @override
+  _HomePage createState() => _HomePage();
+}
 
-class HomePage extends StatelessWidget {
-  final CameraPosition _initialPosition =
-  CameraPosition(target: LatLng(46.983854, 28.840165), zoom: 15);
+
+class _HomePage extends State<HomePage> {
+  final CameraPosition _initialLocation =
+       CameraPosition(target: LatLng(46.983854, 28.840165), zoom: 15);
   Marker m = Marker(markerId: null, position: LatLng(46.983854, 28.840165));
+  GoogleMapController mapController;
   Set<Marker> _markers = HashSet();
 
   @override
@@ -16,8 +22,15 @@ class HomePage extends StatelessWidget {
         body: Stack(
         children: <Widget>[
         GoogleMap(
-          initialCameraPosition: _initialPosition,
+          initialCameraPosition: _initialLocation,
           mapType: MapType.normal,
+          myLocationEnabled: true,
+          myLocationButtonEnabled: false,
+          zoomGesturesEnabled: true,
+          zoomControlsEnabled: false,
+          onMapCreated: (GoogleMapController controller) {
+            mapController = controller;
+          },
         ),
        ]
       ),
@@ -37,7 +50,7 @@ class HomePage extends StatelessWidget {
     showModalBottomSheet(context: context, builder: (BuildContext bd){
 
         return Container(
-            height: MediaQuery.of(context).size.height * .40,
+            height: 270,
              decoration: BoxDecoration(
                color: Colors.white,
                borderRadius: BorderRadius.only(
@@ -53,6 +66,12 @@ class HomePage extends StatelessWidget {
                 TextField(
                     obscureText: false,
                     decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.looks_one),
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.my_location),
+                          onPressed: () {
+                          },
+                        ),
                         contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                         hintText: "Start address",
                         border:
@@ -71,6 +90,7 @@ class HomePage extends StatelessWidget {
                 ),
                 SizedBox(height: 50,),
                 Row(
+                  mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.end,
                  children: [
                    FloatingActionButton(
@@ -81,7 +101,7 @@ class HomePage extends StatelessWidget {
                      backgroundColor: Colors.black,
                      child: Icon(Icons.arrow_downward_rounded),
                    ),
-                   SizedBox(width: 115,),
+                   SizedBox(width: MediaQuery.of(context).size.width * 0.27),
                    IconButton(
                      icon: Icon(Icons.settings, color: Colors.black, size: 35),
                      onPressed: (){

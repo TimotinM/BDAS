@@ -11,7 +11,8 @@
             android:icon="@mipmap/ic_launcher">
 
         <meta-data android:name="com.google.android.geo.API_KEY"
-                   android:value="AIzaSyARFWUV12QwQlV9sVoNAX-f4I8UWBJNwvk"/>
+                   android:value="AIzaSyBicakywqNSpLK51vcJguylhwJ30BBrMAw"/>
+        <!-- Required to fetch data from the internet. -->
 
         <activity
                 android:name=".MainActivity"
@@ -48,4 +49,7 @@
                 android:name="flutterEmbedding"
                 android:value="2" />
     </application>
+    <!-- Required to fetch data from the internet. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
 </manifest>

@@ -4,7 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:untitled/ChangePassword.dart';
 import 'package:untitled/EditProfile.dart';
 
-class Options extends StatelessWidget{
+class Options extends StatefulWidget {
+  @override
+  _Options createState() => _Options();
+}
+
+class _Options extends State<Options>{
   int sRadius = 10;
   int eRadius = 12;
   @override
@@ -95,6 +100,7 @@ class Options extends StatelessWidget{
         //backgroundColor: Colors.grey,
         appBar: AppBar(
           backgroundColor: Colors.white,
+          centerTitle: true,
           title: Text('Settings', style: TextStyle(color: Colors.black),),
           leading: FlatButton(
             textColor: Colors.black,
@@ -107,7 +113,6 @@ class Options extends StatelessWidget{
             },
           ),
         ),
-
         body: Center(
           child: Container(
             color: Colors.grey[200],

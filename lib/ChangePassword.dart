@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 
-class ChangePassword extends StatelessWidget {
+class ChangePassword extends StatefulWidget {
+  @override
+  _ChangePassword createState() => _ChangePassword();
+}
+
+class _ChangePassword extends State<ChangePassword> {
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
 
   @override
@@ -55,9 +60,8 @@ class ChangePassword extends StatelessWidget {
 
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: Center(
-            child: Text('Change Password', textAlign: TextAlign.center, style: TextStyle(color: Colors.white))
-        ),
+        centerTitle: true,
+        title: Text('Change Password', textAlign: TextAlign.center, style: TextStyle(color: Colors.white)),
         leading: FlatButton(
           textColor: Colors.white,
           child: Icon(
