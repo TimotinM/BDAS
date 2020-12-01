@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
           primaryColor: Colors.black,
           canvasColor: Colors.transparent,
       ),
-      home: MapView(),
+      home: Login(),
     );
   }
 }

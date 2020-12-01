@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:untitled/HomePage.dart';
+import 'package:untitled/MapTest.dart';
 import 'package:untitled/Signup.dart';
 import 'package:untitled/User.dart';
 
@@ -50,7 +51,7 @@ class _Login extends State<Login> {
               .push(
               context,
               MaterialPageRoute(
-                  builder: (context) => HomePage()
+                  builder: (context) => MapView()
               )
           );
         },

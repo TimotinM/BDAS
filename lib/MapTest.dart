@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:untitled/Options.dart';
 import 'Secret.dart';
 
 import 'dart:math' show cos, sqrt, asin;
@@ -307,6 +308,7 @@ class _MapViewState extends State<MapView> {
       height: height,
       width: width,
       child: Scaffold(
+        resizeToAvoidBottomPadding: false,
         key: _scaffoldKey,
         body: Stack(
           children: <Widget>[
@@ -333,13 +335,13 @@ class _MapViewState extends State<MapView> {
                   children: <Widget>[
                     ClipOval(
                       child: Material(
-                        color: Colors.blue[100], // button color
+                        color: Colors.black, // button color
                         child: InkWell(
-                          splashColor: Colors.blue, // inkwell color
+                          splashColor: Colors.grey[900], // inkwell color
                           child: SizedBox(
                             width: 50,
                             height: 50,
-                            child: Icon(Icons.add),
+                            child: Icon(Icons.add, color: Colors.white,),
                           ),
                           onTap: () {
                             mapController.animateCamera(
@@ -352,13 +354,13 @@ class _MapViewState extends State<MapView> {
                     SizedBox(height: 20),
                     ClipOval(
                       child: Material(
-                        color: Colors.blue[100], // button color
+                        color: Colors.black, // button color
                         child: InkWell(
-                          splashColor: Colors.blue, // inkwell color
+                          splashColor: Colors.grey[900], // inkwell color
                           child: SizedBox(
                             width: 50,
                             height: 50,
-                            child: Icon(Icons.remove),
+                            child: Icon(Icons.remove, color: Colors.white,),
                           ),
                           onTap: () {
                             mapController.animateCamera(
@@ -372,128 +374,6 @@ class _MapViewState extends State<MapView> {
                 ),
               ),
             ),
-            // Show the place input fields & button for
-            // showing the route
-            SafeArea(
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 10.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white70,
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(20.0),
-                      ),
-                    ),
-                    width: width * 0.9,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Text(
-                            'Places',
-                            style: TextStyle(fontSize: 20.0),
-                          ),
-                          SizedBox(height: 10),
-                          _textField(
-                              label: 'Start',
-                              hint: 'Choose starting point',
-                              prefixIcon: Icon(Icons.looks_one),
-                              suffixIcon: IconButton(
-                                icon: Icon(Icons.my_location),
-                                onPressed: () {
-                                  startAddressController.text = _currentAddress;
-                                  _startAddress = _currentAddress;
-                                },
-                              ),
-                              controller: startAddressController,
-                              width: width,
-                              locationCallback: (String value) {
-                                setState(() {
-                                  _startAddress = value;
-                                });
-                              }),
-                          SizedBox(height: 10),
-                          _textField(
-                              label: 'Destination',
-                              hint: 'Choose destination',
-                              prefixIcon: Icon(Icons.looks_two),
-                              controller: destinationAddressController,
-                              width: width,
-                              locationCallback: (String value) {
-                                setState(() {
-                                  _destinationAddress = value;
-                                });
-                              }),
-                          SizedBox(height: 10),
-                          Visibility(
-                            visible: _placeDistance == null ? false : true,
-                            child: Text(
-                              'DISTANCE: $_placeDistance km',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 5),
-                          RaisedButton(
-                            onPressed: (_startAddress != '' &&
-                                _destinationAddress != '')
-                                ? () async {
-                              setState(() {
-                                if (markers.isNotEmpty) markers.clear();
-                                if (polylines.isNotEmpty)
-                                  polylines.clear();
-                                if (polylineCoordinates.isNotEmpty)
-                                  polylineCoordinates.clear();
-                                _placeDistance = null;
-                              });
-
-                              _calculateDistance().then((isCalculated) {
-                                if (isCalculated) {
-                                  _scaffoldKey.currentState.showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                          'Distance Calculated Sucessfully'),
-                                    ),
-                                  );
-                                } else {
-                                  _scaffoldKey.currentState.showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                          'Error Calculating Distance'),
-                                    ),
-                                  );
-                                }
-                              });
-                            }
-                                : null,
-                            color: Colors.red,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Show Route'.toUpperCase(),
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20.0,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            // Show current location button
             SafeArea(
               child: Align(
                 alignment: Alignment.bottomRight,
@@ -501,13 +381,13 @@ class _MapViewState extends State<MapView> {
                   padding: const EdgeInsets.only(right: 10.0, bottom: 10.0),
                   child: ClipOval(
                     child: Material(
-                      color: Colors.orange[100], // button color
+                      color: Colors.black, // button color
                       child: InkWell(
-                        splashColor: Colors.orange, // inkwell color
+                        splashColor: Colors.grey[900], // inkwell color
                         child: SizedBox(
                           width: 56,
                           height: 56,
-                          child: Icon(Icons.my_location),
+                          child: Icon(Icons.my_location, color: Colors.white,),
                         ),
                         onTap: () {
                           mapController.animateCamera(
@@ -530,7 +410,124 @@ class _MapViewState extends State<MapView> {
             ),
           ],
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: (){
+            popUpMenu(context);
+          },
+          elevation: 3,
+          backgroundColor: Colors.black,
+          child: Icon(Icons.arrow_upward_rounded),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
     );
+
+  }
+  popUpMenu(context)
+  {
+    showModalBottomSheet(isScrollControlled: true, context: context, builder: (BuildContext bd ,){
+      return new AnimatedPadding(
+          padding: MediaQuery.of(context).viewInsets,
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.decelerate,
+      child: Container(
+
+          height: 270,
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              )
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+            child:Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget> [
+                SizedBox(height: 35),
+                _textField(
+                    label: 'Start',
+                    hint: 'Choose starting point',
+                    prefixIcon: Icon(Icons.looks_one),
+                    suffixIcon: IconButton(
+                      icon: Icon(Icons.my_location),
+                      onPressed: () {
+                        startAddressController.text = _currentAddress;
+                        _startAddress = _currentAddress;
+                      },
+                    ),
+                    controller: startAddressController,
+                    width: MediaQuery.of(context).size.width,
+                    locationCallback: (String value) {
+                      setState(() {
+                        _startAddress = value;
+                      });
+                    }),
+                SizedBox(height: 10),
+                _textField(
+                    label: 'Destination',
+                    hint: 'Choose destination',
+                    prefixIcon: Icon(Icons.looks_two),
+                    controller: destinationAddressController,
+                    width: MediaQuery.of(context).size.width,
+                    locationCallback: (String value) {
+                      setState(() {
+                        _destinationAddress = value;
+                      });
+                    }),
+                SizedBox(height: 50,),
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    FloatingActionButton(
+                      onPressed: (_startAddress != '' &&
+                          _destinationAddress != '')
+                          ? () async {
+                        setState(() {
+                          if (markers.isNotEmpty) markers.clear();
+                          if (polylines.isNotEmpty)
+                            polylines.clear();
+                          if (polylineCoordinates.isNotEmpty)
+                            polylineCoordinates.clear();
+                          _placeDistance = null;
+                        });
+
+                        _calculateDistance();
+                        Navigator.of(context).pop();
+                      }
+                          : null,
+                      elevation: 3,
+                      backgroundColor: Colors.black,
+                      child: Icon(Icons.arrow_downward_rounded),
+                    ),
+                    SizedBox(width: MediaQuery.of(context).size.width * 0.27),
+                    IconButton(
+                      icon: Icon(Icons.settings, color: Colors.black, size: 35),
+                      onPressed: (){
+                        Navigator
+                            .push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Options()
+                            )
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        )
+      );
+
+    }
+
+    );
+
   }
 }
+
+
