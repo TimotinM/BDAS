@@ -6,38 +6,68 @@ class ChangePassword extends StatefulWidget {
 }
 
 class _ChangePassword extends State<ChangePassword> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final _newPasswordController = TextEditingController();
+  final _confirmNewPasswordController = TextEditingController();
+  final _currentPasswordController = TextEditingController();
+
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
 
   @override
   Widget build(BuildContext context) {
 
-    final curentPassword = TextField(
+    final curentPassword = TextFormField(
       obscureText: true,
       style: style,
+      controller: _currentPasswordController,
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
           hintText: "Current password",
           border:
           OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
+      validator: (String value){
+        if(value.isEmpty)
+          return "Pleas enter current password";
+        return null;
+      },
     );
-    final newPassword = TextField(
+
+    final newPassword = TextFormField(
       obscureText: true,
       style: style,
+      controller: _newPasswordController,
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
           hintText: "New password",
           border:
           OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
+      validator: (String value){
+        if(value.isEmpty)
+          return "Pleas enter current new password";
+        return null;
+      },
     );
-    final confirmNewPassword = TextField(
+
+    final confirmNewPassword = TextFormField(
       obscureText: true,
       style: style,
+      controller: _confirmNewPasswordController,
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
           hintText: "Confirm new password",
           border:
           OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
+      validator: (String value){
+        if(value.isEmpty){
+          return "Pleas confirm password";
+        }
+        if(_newPasswordController.text != _confirmNewPasswordController.text){
+          return "Password do not match";
+        }
+        return null;
+      },
     );
+
     final saveButon = Material(
       elevation: 5.0,
       borderRadius: BorderRadius.circular(30.0),
@@ -46,8 +76,14 @@ class _ChangePassword extends State<ChangePassword> {
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () {
-          Navigator
-              .pop(context);
+          if(_formKey.currentState.validate())
+          {
+            return Navigator
+                .pop(context);;
+          }else
+          {
+            print("Unsuccessful");
+          }
         },
         child: Text("Save",
             textAlign: TextAlign.center,
@@ -81,33 +117,38 @@ class _ChangePassword extends State<ChangePassword> {
           color: Colors.white,
           child: Padding(
             padding: const EdgeInsets.all(35.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                SizedBox(
-                  height: 100.0,
-                  child: Image.asset(
-                    "assets/logo.png",
-                    fit: BoxFit.contain,
-                  ),
-                ),
-                SizedBox(height: 45.0),
-                curentPassword,
-                SizedBox(height: 25.0),
-                newPassword,
-                SizedBox(height: 25.0,),
-                confirmNewPassword,
-                SizedBox(height: 35.0,),
-                saveButon,
-                SizedBox(
-                  height: 15.0,
-                ),
-              ],
+            child: SingleChildScrollView(
+             child: Form(
+               key: _formKey,
+               child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    SizedBox(
+                      height: 100.0,
+                      child: Image.asset(
+                        "assets/logo.png",
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    SizedBox(height: 45.0),
+                    curentPassword,
+                    SizedBox(height: 25.0),
+                    newPassword,
+                    SizedBox(height: 25.0,),
+                    confirmNewPassword,
+                    SizedBox(height: 35.0,),
+                    saveButon,
+                    SizedBox(
+                      height: 15.0,
+                 ),
+                ],
+              ),
             ),
-          ),
+           ),
+         ),
         ),
-      ),
+       ),
       ),
     );
   }

@@ -15,8 +15,8 @@ class _Signup extends State<Signup> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _loginController = TextEditingController();
 
-  String _login;
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
 
   @override
@@ -25,6 +25,7 @@ class _Signup extends State<Signup> {
     final emailField = TextFormField(
       obscureText: false,
       style: style,
+      controller: _loginController,
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
           hintText: "Login",
@@ -34,9 +35,6 @@ class _Signup extends State<Signup> {
         if(value.isEmpty)
           return "Pleas enter login";
         return null;
-      },
-      onSaved: (String login){
-        _login = login;
       },
     );
     final passwordField = TextFormField(
@@ -84,14 +82,14 @@ class _Signup extends State<Signup> {
         onPressed: (){
           if(_formKey.currentState.validate())
           {
-            print(_login);
+            print(_loginController.text);
             return;
           }else
             {
-              print("Unsuccesfull");
+              print("Unsuccessful");
             }
         },
-        child: Text("Singup",
+        child: Text("Signup",
             textAlign: TextAlign.center,
             style: style.copyWith(
                 color: Colors.white, fontWeight: FontWeight.bold)),
@@ -107,17 +105,11 @@ class _Signup extends State<Signup> {
         "Login",
         style: TextStyle(
           color: Colors.blue,
-          fontSize: 20,
+          fontSize: 16,
         ),
       ),
     );
 
-    final error =Text(
-      "Password does not match",
-      style: TextStyle(
-        color: Colors.red,
-      ),
-    );
 
     return Scaffold(
       body: Center(
@@ -148,7 +140,14 @@ class _Signup extends State<Signup> {
                         SizedBox(height: 35.0,),
                         singupButon,
                         SizedBox(height: 15.0,),
-                        login,
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("Already have an account?"),
+                            login,
+                          ],
+                        ),
                       ],
                     ),
                  ),

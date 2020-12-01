@@ -11,11 +11,10 @@ class Login extends StatefulWidget {
 }
 
 class _Login extends State<Login> {
-  final loginController = TextEditingController();
-  final passwordController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final _passwordController = TextEditingController();
+  final _loginController = TextEditingController();
 
-  String login = '';
-  String password = '';
 
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
    Future<User> futureUser;
@@ -27,8 +26,8 @@ class _Login extends State<Login> {
   }*/
   Widget build(BuildContext context) {
 
-    final emailField = TextField(
-      controller: loginController,
+    final emailField = TextFormField(
+      controller: _loginController,
       obscureText: false,
       style: style,
       decoration: InputDecoration(
@@ -36,9 +35,14 @@ class _Login extends State<Login> {
           hintText: "Login",
           border:
           OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
+       validator: (String value){
+        if(value.isEmpty)
+          return "Pleas enter login";
+        return null;
+      },
     );
-    final passwordField = TextField(
-      controller: passwordController,
+    final passwordField = TextFormField(
+      controller: _passwordController,
       obscureText: true,
       style: style,
       decoration: InputDecoration(
@@ -46,6 +50,11 @@ class _Login extends State<Login> {
           hintText: "Password",
           border:
           OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
+      validator: (String value){
+        if(value.isEmpty)
+          return "Pleas enter password";
+        return null;
+      },
     );
     final loginButon = Material(
       elevation: 5.0,
@@ -55,17 +64,20 @@ class _Login extends State<Login> {
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () {
-          login = loginController.text;
-          password = passwordController.text;
-          print(login);
-          print(password);
-          Navigator
-              .push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => MapView()
-              )
-          );
+          if(_formKey.currentState.validate())
+          {
+            return Navigator
+                .push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => MapView()
+                )
+            );
+          }else
+          {
+            print("Unsuccessful");
+          }
+
         },
         child: Text("Login",
             textAlign: TextAlign.center,
@@ -85,21 +97,23 @@ class _Login extends State<Login> {
           );
         },
         child: Text(
-        "Sing Up",
+        "Signup",
         style: TextStyle(
         color: Colors.blue,
-        fontSize: 20,
+        fontSize: 16,
        ),
       ),
     );
 
     return Scaffold(
       body: Center(
-        child: Container(
          child: Container(
           color: Colors.white,
           child: Padding(
             padding: const EdgeInsets.all(35.0),
+           child: SingleChildScrollView(
+           child: Form(
+             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -122,11 +136,19 @@ class _Login extends State<Login> {
                 SizedBox(
                   height: 15.0,
                 ),
-                singUp
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Don't have an account?"),
+                    singUp,
+                  ],
+                ),
               ],
             ),
           ),
         ),
+       ),
       ),
       ),
     );

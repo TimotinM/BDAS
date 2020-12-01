@@ -326,54 +326,7 @@ class _MapViewState extends State<MapView> {
                 mapController = controller;
               },
             ),
-            // Show zoom buttons
-            SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    ClipOval(
-                      child: Material(
-                        color: Colors.black, // button color
-                        child: InkWell(
-                          splashColor: Colors.grey[900], // inkwell color
-                          child: SizedBox(
-                            width: 50,
-                            height: 50,
-                            child: Icon(Icons.add, color: Colors.white,),
-                          ),
-                          onTap: () {
-                            mapController.animateCamera(
-                              CameraUpdate.zoomIn(),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    ClipOval(
-                      child: Material(
-                        color: Colors.black, // button color
-                        child: InkWell(
-                          splashColor: Colors.grey[900], // inkwell color
-                          child: SizedBox(
-                            width: 50,
-                            height: 50,
-                            child: Icon(Icons.remove, color: Colors.white,),
-                          ),
-                          onTap: () {
-                            mapController.animateCamera(
-                              CameraUpdate.zoomOut(),
-                            );
-                          },
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
+
             SafeArea(
               child: Align(
                 alignment: Alignment.bottomRight,

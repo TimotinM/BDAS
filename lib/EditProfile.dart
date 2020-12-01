@@ -8,6 +8,8 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfile extends State<EditProfile>{
+
+
   String userName = "Ion";
   String userSurname = "Noi";
   String phoneNumber = "060123456";
