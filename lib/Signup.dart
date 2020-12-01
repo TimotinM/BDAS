@@ -1,5 +1,9 @@
 
+//import 'dart:html';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:untitled/EditProfile.dart';
 import 'package:untitled/Login.dart';
 
 class Signup extends StatefulWidget {
@@ -8,12 +12,17 @@ class Signup extends StatefulWidget {
 }
 
 class _Signup extends State<Signup> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+
+  String _login;
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
 
   @override
   Widget build(BuildContext context) {
 
-    final emailField = TextField(
+    final emailField = TextFormField(
       obscureText: false,
       style: style,
       decoration: InputDecoration(
@@ -21,8 +30,17 @@ class _Signup extends State<Signup> {
           hintText: "Login",
           border:
           OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
+      validator: (String value){
+        if(value.isEmpty)
+          return "Pleas enter login";
+        return null;
+      },
+      onSaved: (String login){
+        _login = login;
+      },
     );
-    final passwordField = TextField(
+    final passwordField = TextFormField(
+      controller: _passwordController,
       obscureText: true,
       style: style,
       decoration: InputDecoration(
@@ -30,8 +48,15 @@ class _Signup extends State<Signup> {
           hintText: "Password",
           border:
           OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
+          validator: (String value){
+              if(value.isEmpty){
+                return "Pleas enter password";
+              }
+             return null;
+          },
     );
-    final repeatPasswordField = TextField(
+    final repeatPasswordField = TextFormField(
+      controller: _confirmPasswordController,
       obscureText: true,
       style: style,
       decoration: InputDecoration(
@@ -39,16 +64,32 @@ class _Signup extends State<Signup> {
           hintText: "Confirm Password",
           border:
           OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
+      validator: (String value){
+        if(value.isEmpty){
+          return "Pleas confirm password";
+        }
+        if(_passwordController.text != _confirmPasswordController.text){
+          return "Password do not match";
+        }
+        return null;
+      },
     );
-    final loginButon = Material(
+    final singupButon = Material(
       elevation: 5.0,
       borderRadius: BorderRadius.circular(30.0),
       color: Colors.black,
       child: MaterialButton(
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-        onPressed: () {
-
+        onPressed: (){
+          if(_formKey.currentState.validate())
+          {
+            print(_login);
+            return;
+          }else
+            {
+              print("Unsuccesfull");
+            }
         },
         child: Text("Singup",
             textAlign: TextAlign.center,
@@ -71,40 +112,50 @@ class _Signup extends State<Signup> {
       ),
     );
 
+    final error =Text(
+      "Password does not match",
+      style: TextStyle(
+        color: Colors.red,
+      ),
+    );
+
     return Scaffold(
       body: Center(
-        child: Container(
-        child: Container(
+         child: Container(
           color: Colors.white,
           child: Padding(
             padding: const EdgeInsets.all(35.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                SizedBox(
-                  height: 100.0,
-                  child: Image.asset(
-                    "assets/logo.png",
-                    fit: BoxFit.contain,
-                  ),
-                ),
-                SizedBox(height: 45.0),
-                emailField,
-                SizedBox(height: 25.0),
-                passwordField,
-                SizedBox(height: 25.0,),
-                repeatPasswordField,
-                SizedBox(height: 35.0,),
-                loginButon,
-                SizedBox(height: 15.0,),
-                login
-              ],
+            child: SingleChildScrollView(
+               child: Form(
+                key: _formKey,
+                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        SizedBox(
+                          height: 100.0,
+                          child: Image.asset(
+                            "assets/logo.png",
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        SizedBox(height: 45.0),
+                        emailField,
+                        SizedBox(height: 25.0),
+                        passwordField,
+                        SizedBox(height: 25.0,),
+                        repeatPasswordField,
+                        SizedBox(height: 35.0,),
+                        singupButon,
+                        SizedBox(height: 15.0,),
+                        login,
+                      ],
+                    ),
+                 ),
+              ),
             ),
           ),
-        ),
-      ),
-      ),
+      )
     );
   }
 }

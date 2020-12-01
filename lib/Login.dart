@@ -11,6 +11,12 @@ class Login extends StatefulWidget {
 }
 
 class _Login extends State<Login> {
+  final loginController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  String login = '';
+  String password = '';
+
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
    Future<User> futureUser;
    
@@ -22,6 +28,7 @@ class _Login extends State<Login> {
   Widget build(BuildContext context) {
 
     final emailField = TextField(
+      controller: loginController,
       obscureText: false,
       style: style,
       decoration: InputDecoration(
@@ -31,6 +38,7 @@ class _Login extends State<Login> {
           OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
     );
     final passwordField = TextField(
+      controller: passwordController,
       obscureText: true,
       style: style,
       decoration: InputDecoration(
@@ -47,6 +55,10 @@ class _Login extends State<Login> {
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () {
+          login = loginController.text;
+          password = passwordController.text;
+          print(login);
+          print(password);
           Navigator
               .push(
               context,
