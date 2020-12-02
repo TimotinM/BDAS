@@ -2,13 +2,13 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class User {
-  int id;
-  String login;
-  String password;
-  String name;
-  String surname;
-  String phone;
-  Car car;
+    final int id;
+    final String login;
+    final String password;
+    final String name;
+    final String surname;
+    final String phone;
+    final Car car;
 
   User({this.id, this.login, this.password, this.name, this.surname, this.phone, this.car});
 
@@ -43,7 +43,7 @@ class Car{
 }
 
 Future<User> fetchUser() async {
-  final response = await http.get('hitchhikeapi.heroku.com/api/users/2');
+  final response = await http.get('https://hitchhikeapi.heroku.com/api/users/2');
 
   if (response.statusCode == 200) {
 
@@ -54,4 +54,29 @@ Future<User> fetchUser() async {
     throw Exception('Failed to load album');
   }
 }
+
+Future<User> createLogin(String login, String password) async {
+
+  final http.Response response = await http.post(
+    'https://hitchhikeapi.herokuapp.com/api/users',
+    headers: <String , String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, String>{
+      'login': login,
+      'password': password,
+      'name': 'name',
+      'surname': 'surname',
+      'phone': 'phone',
+      'car': null,
+    }),
+  );
+  if (response.statusCode == 201) {
+    return User.fromJson(jsonDecode(response.body));
+  } else {
+    throw Exception('Failed to create album.');
+  }
+}
+
+
 

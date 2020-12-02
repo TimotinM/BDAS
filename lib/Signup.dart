@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/EditProfile.dart';
 import 'package:untitled/Login.dart';
+import 'package:untitled/User.dart';
 
 class Signup extends StatefulWidget {
   @override
@@ -83,7 +84,7 @@ class _Signup extends State<Signup> {
         onPressed: (){
           if(_formKey.currentState.validate())
           {
-            print(_loginController.text);
+            createLogin( _loginController.text ,_passwordController.text);
             return;
           }else
             {
