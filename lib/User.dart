@@ -2,13 +2,13 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class User {
-  final int id;
-  final String login;
-  final String password;
-  final String name;
-  final String surname;
-  final String phone;
-  final Car car;
+  int id;
+  String login;
+  String password;
+  String name;
+  String surname;
+  String phone;
+  Car car;
 
   User({this.id, this.login, this.password, this.name, this.surname, this.phone, this.car});
 
@@ -24,25 +24,29 @@ class User {
     );
   }
 
+  Map<String, dynamic> loginToJson() =>
+      {
+        'login': login,
+        'password': password,
+      };
 }
 
 
 class Car{
-  final int id;
-  final String mark;
-  final String model;
-  final String year;
-  final int seats;
+  int id;
+  String mark;
+  String model;
+  String year;
+  int seats;
 
   Car({this.id, this.mark, this.model, this.year, this.seats});
 }
 
-Future<User> fetchAlbum() async {
-  final response = await http.get('94.237.97.211:8880/api/users/4');
+Future<User> fetchUser() async {
+  final response = await http.get('hitchhikeapi.heroku.com/api/users/2');
 
   if (response.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
+
     return User.fromJson(jsonDecode(response.body));
   } else {
     // If the server did not return a 200 OK response,

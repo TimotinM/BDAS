@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:untitled/Options.dart';
 import 'Secret.dart';
+import 'Data.dart' as data;
 
 import 'dart:math' show cos, sqrt, asin;
 
@@ -446,6 +447,7 @@ class _MapViewState extends State<MapView> {
                             polylineCoordinates.clear();
                           _placeDistance = null;
                         });
+                        print(data.user);
 
                         _calculateDistance();
                         Navigator.of(context).pop();

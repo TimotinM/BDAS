@@ -17,6 +17,7 @@ class _Signup extends State<Signup> {
   final _confirmPasswordController = TextEditingController();
   final _loginController = TextEditingController();
 
+
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
 
   @override

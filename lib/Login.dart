@@ -4,6 +4,7 @@ import 'package:untitled/HomePage.dart';
 import 'package:untitled/MapTest.dart';
 import 'package:untitled/Signup.dart';
 import 'package:untitled/User.dart';
+import 'Data.dart' as data;
 
 class Login extends StatefulWidget {
   @override
@@ -14,6 +15,7 @@ class _Login extends State<Login> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
   final _loginController = TextEditingController();
+
 
 
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
@@ -66,6 +68,9 @@ class _Login extends State<Login> {
         onPressed: () {
           if(_formKey.currentState.validate())
           {
+            //data.user.login = _loginController.text;
+            //data.user.password = _passwordController.text;
+            data.user = fetchUser();
             return Navigator
                 .push(
                 context,
