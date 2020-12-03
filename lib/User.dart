@@ -42,8 +42,8 @@ class Car{
   Car({this.id, this.mark, this.model, this.year, this.seats});
 }
 
-Future<User> fetchUser() async {
-  final response = await http.get('https://hitchhikeapi.heroku.com/api/users/2');
+Future<User> fetchUser(String id) async {
+  final response = await http.get('https://hitchhikeapi.heroku.com/api/users/' + id);
 
   if (response.statusCode == 200) {
 
@@ -75,6 +75,41 @@ Future<User> createLogin(String login, String password) async {
     return User.fromJson(jsonDecode(response.body));
   } else {
     throw Exception('Failed to create album.');
+  }
+}
+
+Future<User> updateUser() async {
+
+  final http.Response response = await http.post(
+    'https://hitchhikeapi.herokuapp.com/api/users/' + 'id',
+    headers: <String , String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, String>{
+      'login': 'login',
+      'password': 'password',
+      'name': 'name',
+      'surname': 'surname',
+      'phone': 'phone',
+      'car': null,
+    }),
+  );
+  if (response.statusCode == 201) {
+    return User.fromJson(jsonDecode(response.body));
+  } else {
+    throw Exception('Failed to create album.');
+  }
+}
+
+Future<String> verifyLogin(String login, String password) async {
+  final http.Response response = await http.get(
+    'https://hitchhikeapi.herokuapp.com/api/login?login=' + login + '&password=' + password,
+  );
+  if (response.statusCode == 200) {
+    return response.body;
+  }
+  if (response.statusCode == 401) {
+    return "-1";
   }
 }
 

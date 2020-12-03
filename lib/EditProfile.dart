@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 
 class EditProfile extends StatefulWidget {
@@ -8,8 +6,12 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfile extends State<EditProfile>{
-
-
+ final _nameController = TextEditingController();
+ final _surnameController = TextEditingController();
+ final _phoneController = TextEditingController();
+ final _modelController = TextEditingController();
+ final _plateController = TextEditingController();
+ 
   String userName = "Ion";
   String userSurname = "Noi";
   String phoneNumber = "060123456";

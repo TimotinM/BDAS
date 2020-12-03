@@ -16,6 +16,7 @@ class _Login extends State<Login> {
   final _passwordController = TextEditingController();
   final _loginController = TextEditingController();
 
+  String loginError = '';
 
 
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
@@ -68,21 +69,32 @@ class _Login extends State<Login> {
         onPressed: () {
           if(_formKey.currentState.validate())
           {
-            //data.user.login = _loginController.text;
-            //data.user.password = _passwordController.text;
-            data.user = fetchUser();
-            return Navigator
+
+            var login = _loginController.text;
+            var password = _passwordController.text;
+            Future<String> id= verifyLogin(login, password);
+
+            id.then((id) {
+              if (id != "-1") {
+                data.user = fetchUser(id);
+                return Navigator
                 .push(
                 context,
                 MaterialPageRoute(
                     builder: (context) => MapView()
                 )
-            );
-          }else
-          {
-            print("Unsuccessful");
-          }
+                );
+              } else {
+                setState((){
+                  loginError = 'Login Failed';
+                });
+              }
 
+            }, onError: (e) {
+                print(e);
+
+            });
+          }
         },
         child: Text("Login",
             textAlign: TextAlign.center,
@@ -149,6 +161,8 @@ class _Login extends State<Login> {
                     singUp,
                   ],
                 ),
+                    Text(loginError,
+                style: TextStyle(color: Colors.red),),
               ],
             ),
           ),

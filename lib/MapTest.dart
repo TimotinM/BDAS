@@ -31,6 +31,13 @@ class _MapViewState extends State<MapView> {
   String _startAddress = '';
   String _destinationAddress = '';
   String _placeDistance;
+  bool  isDriver = true;
+
+  Icon fab = Icon(
+    IconData(61806, fontFamily: 'MaterialIcons'),
+    color: Colors.black,
+    size: 56,
+  );
 
   Set<Marker> markers = {};
 
@@ -362,6 +369,45 @@ class _MapViewState extends State<MapView> {
                 ),
               ),
             ),
+
+            SafeArea(
+              child: Align(
+                alignment: Alignment.topRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 10.0, top: 10.0),
+                  child: ClipOval(
+                    child: Material(
+                      color: Colors.transparent, // button color
+                      child: InkWell(
+                        splashColor: Colors.transparent, // inkwell color
+                        child: SizedBox(
+                          width: 56,
+                          height: 56,
+                          child: fab,
+                        ),
+                        onTap: () => setState((){
+                                if(isDriver){
+                                  fab = Icon(
+                                      IconData(61813, fontFamily: 'MaterialIcons'),
+                                      color: Colors.black,
+                                      size: 56
+                                  );
+                                  isDriver = false;
+                                }else{
+                                  fab = Icon(
+                                      IconData(61806, fontFamily: 'MaterialIcons'),
+                                      color: Colors.black,
+                                      size: 56,
+                                  );
+                                  isDriver = true;
+                                }
+                                },
+                        )),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
         floatingActionButton: FloatingActionButton(
@@ -377,6 +423,7 @@ class _MapViewState extends State<MapView> {
     );
 
   }
+
   popUpMenu(context)
   {
     showModalBottomSheet(isScrollControlled: true, context: context, builder: (BuildContext bd ,){
