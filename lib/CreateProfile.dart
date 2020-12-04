@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:untitled/MapTest.dart';
 import 'package:untitled/User.dart';
 import 'Data.dart' as data;
 
@@ -21,8 +22,12 @@ class _CreateProfile extends State<CreateProfile> {
   String carModel = '';
   String registrationPlate = '';
 
-  _showDialog(
-      TextEditingController controller, String variable, String text) async {
+
+  _showDialog(TextEditingController controller, String variable, String text) async {
+    TextInputType keyboard = TextInputType.text;
+    if(text == "Phone Number"){
+      keyboard = TextInputType.number;
+    }
     await showDialog<String>(
       context: context,
       child: new AlertDialog(
@@ -31,6 +36,7 @@ class _CreateProfile extends State<CreateProfile> {
           children: <Widget>[
             new Expanded(
               child: new TextFormField(
+                keyboardType: keyboard,
                 autofocus: true,
                 controller: controller,
                 decoration: new InputDecoration(labelText: text),
@@ -96,7 +102,6 @@ class _CreateProfile extends State<CreateProfile> {
           userName,
           style: TextStyle(color: Colors.grey),
         ),
-        trailing: Icon(Icons.keyboard_arrow_down),
         onTap: () {
           _showDialog(_nameController, userName, "Name");
         },
@@ -113,7 +118,6 @@ class _CreateProfile extends State<CreateProfile> {
           userSurname,
           style: TextStyle(color: Colors.grey),
         ),
-        trailing: Icon(Icons.keyboard_arrow_down),
         onTap: () {
           _showDialog(_surnameController, userSurname, "Surname");
         },
@@ -128,9 +132,8 @@ class _CreateProfile extends State<CreateProfile> {
         title: Text('Phone Number'),
         subtitle: Text(
           phoneNumber,
-          style: TextStyle(color: Colors.grey),
+          style: TextStyle(color: Colors.grey,),
         ),
-        trailing: Icon(Icons.keyboard_arrow_down),
         onTap: () {
           _showDialog(_phoneController, phoneNumber, "Phone Number");
         },
@@ -147,7 +150,6 @@ class _CreateProfile extends State<CreateProfile> {
           carModel,
           style: TextStyle(color: Colors.grey),
         ),
-        trailing: Icon(Icons.keyboard_arrow_down),
         onTap: () {
           _showDialog(_modelController, carModel, "Car Model");
         },
@@ -164,7 +166,6 @@ class _CreateProfile extends State<CreateProfile> {
           registrationPlate,
           style: TextStyle(color: Colors.grey),
         ),
-        trailing: Icon(Icons.keyboard_arrow_down),
         onTap: () {
           _showDialog(
               _plateController, registrationPlate, "Registration Plate");
@@ -174,13 +175,39 @@ class _CreateProfile extends State<CreateProfile> {
     );
 
     return Scaffold(
+        resizeToAvoidBottomPadding: false,
         appBar: AppBar(
           actions: [
             FlatButton(
               onPressed: () {
-                if (_formKey.currentState.validate()) {
+                if (userName.isEmpty || userSurname.isEmpty || phoneNumber.isEmpty) {
+                     print("error");
+                     showDialog<void>(
+                       context: context,
+                       barrierDismissible: false, // user must tap button!
+                       builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Error'),
+                            content: Text('You have not filled in all the fields in the "Basic Information"'),
+                            actions: <Widget>[
+                              TextButton(
+                                child: Text('OK'),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ],
+                          );
+                        }
+                     );
                 } else {
-                  print("Unsuccessful");
+                  return Navigator
+                      .push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>MapView()
+                      )
+                  );
                 }
               },
               child: Text(

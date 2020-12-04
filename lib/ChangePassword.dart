@@ -79,10 +79,7 @@ class _ChangePassword extends State<ChangePassword> {
           if(_formKey.currentState.validate())
           {
             return Navigator
-                .pop(context);;
-          }else
-          {
-            print("Unsuccessful");
+                .pop(context);
           }
         },
         child: Text("Save",

@@ -10,8 +10,47 @@ class Options extends StatefulWidget {
 }
 
 class _Options extends State<Options>{
-  int sRadius = 10;
-  int eRadius = 12;
+  TextEditingController _startRadiusController = TextEditingController();
+  TextEditingController _endRadiusController = TextEditingController();
+
+  int startRadius = 50;
+  int endRadius = 50;
+
+  _showDialog(TextEditingController controller, String text) async {
+
+    await showDialog<String>(
+      context: context,
+      child: new AlertDialog(
+        contentPadding: const EdgeInsets.all(16.0),
+        content: new Row(
+          children: <Widget>[
+            new Expanded(
+              child: new TextFormField(
+                keyboardType: TextInputType.number,
+                autofocus: true,
+                controller: controller,
+                decoration: new InputDecoration(labelText: text , hintText: " In meters"),
+              ),
+            )
+          ],
+        ),
+        actions: <Widget>[
+          new FlatButton(
+              child: const Text('CANCEL'),
+              onPressed: () {
+                Navigator.pop(context);
+              }),
+          new FlatButton(
+              child: const Text('SAVE'),
+              onPressed: () {
+                setState(() {});
+                Navigator.pop(context);
+              })
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context){
       final ariaSet = Text(
@@ -36,11 +75,13 @@ class _Options extends State<Options>{
         child: ListTile(
           title: Text("Start Radius"),
           subtitle: Text(
-              sRadius.toString() + ' m' ,
+              _startRadiusController.text,
               style: TextStyle(color: Colors.grey),
           ),
           leading: Icon(IconData(61474, fontFamily: 'MaterialIcons')),
-          onTap: () => print(sRadius),
+          onTap: () {
+            _showDialog(_startRadiusController, "Start Radius");
+          }
       ),
       );
 
@@ -50,12 +91,14 @@ class _Options extends State<Options>{
         child: ListTile(
           title: Text("End Radius"),
           subtitle: Text(
-            eRadius.toString() + ' m',
+            _endRadiusController.text,
             style: TextStyle(color: Colors.grey),
           ),
           leading: Icon(IconData(61474, fontFamily: 'MaterialIcons')),
 
-          onTap: () => print(eRadius),
+          onTap: (){
+            _showDialog(_endRadiusController, "End Radius");
+          },
         ),
       );
 

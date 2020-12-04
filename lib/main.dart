@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:untitled/CreateProfile.dart';
 //import 'package:untitled/CreateProfile.dart';
 import 'package:untitled/EditProfile.dart';
 import 'package:untitled/MapTest.dart';
@@ -20,6 +21,7 @@ class MyApp extends StatelessWidget {
           primaryColor: Colors.black,
           canvasColor: Colors.transparent,
         ),
-        home: MapView());
+        home: Options()
+    );
   }
 }
