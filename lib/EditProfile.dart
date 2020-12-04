@@ -5,25 +5,24 @@ class EditProfile extends StatefulWidget {
   _EditProfile createState() => _EditProfile();
 }
 
-class _EditProfile extends State<EditProfile>{
- final _nameController = TextEditingController();
- final _surnameController = TextEditingController();
- final _phoneController = TextEditingController();
- final _modelController = TextEditingController();
- final _plateController = TextEditingController();
- 
+class _EditProfile extends State<EditProfile> {
+  final _nameController = TextEditingController();
+  final _surnameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _modelController = TextEditingController();
+  final _plateController = TextEditingController();
+
   String userName = "Ion";
   String userSurname = "Noi";
   String phoneNumber = "060123456";
   @override
-  Widget build(BuildContext context){
-
-    final Avatar =  CircleAvatar(
+  Widget build(BuildContext context) {
+    final Avatar = CircleAvatar(
       radius: 50,
       backgroundImage: AssetImage('assets/profile.jpg'),
     );
 
-    final Name =  Text(
+    final Name = Text(
       userName + " " + userSurname,
       style: TextStyle(
         fontSize: 30,
@@ -34,10 +33,7 @@ class _EditProfile extends State<EditProfile>{
 
     final BasicInformation = Text(
       'Basic Information',
-      style: TextStyle(
-          color: Colors.white,
-          fontSize: 15
-      ),
+      style: TextStyle(color: Colors.white, fontSize: 15),
     );
 
     final ChangeName = Container(
@@ -86,45 +82,44 @@ class _EditProfile extends State<EditProfile>{
     );
 
     return Scaffold(
-
       appBar: AppBar(
         actions: [
           FlatButton(
             onPressed: () {
               print("Done");
-              },
+            },
             child: Text(
               "Done",
-               style: TextStyle(
-                 color: Colors.white,
-                 fontSize: 20,
-               ),
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+              ),
             ),
           )
         ],
         backgroundColor: Colors.black,
         centerTitle: true,
-        title: Text('Edit Profile', textAlign: TextAlign.center, style: TextStyle(color: Colors.white)),
-         leading: FlatButton(
+        title: Text('Edit Profile',
+            textAlign: TextAlign.center, style: TextStyle(color: Colors.white)),
+        leading: FlatButton(
           textColor: Colors.white,
           child: Icon(
             Icons.arrow_back,
             color: Colors.white,
           ),
           onPressed: () {
-            Navigator
-                .pop(context);
+            Navigator.pop(context);
           },
         ),
       ),
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.grey,
       body: Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget> [
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
             Avatar,
             SizedBox(height: 25),
-           // Name,
+            // Name,
             //SizedBox(height: 35),
             BasicInformation,
             SizedBox(height: 5),
@@ -133,8 +128,8 @@ class _EditProfile extends State<EditProfile>{
             ChangeSurname,
             SizedBox(height: 2),
             PhoneNumber,
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }
