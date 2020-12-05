@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:untitled/MapTest.dart';
+import 'package:untitled/HomePage.dart';
 import 'package:untitled/User.dart';
 import 'Data.dart' as data;
 
@@ -221,19 +221,9 @@ class _CreateProfile extends State<CreateProfile> {
           ],
           backgroundColor: Colors.black,
           centerTitle: true,
-          title: Text('Edit Profile',
+          title: Text('Create Profile',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.white)),
-          leading: FlatButton(
-            textColor: Colors.white,
-            child: Icon(
-              Icons.arrow_back,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
         ),
         backgroundColor: Colors.black,
         body: Center(
