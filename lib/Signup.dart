@@ -7,6 +7,7 @@ import 'package:untitled/EditProfile.dart';
 import 'package:untitled/Login.dart';
 import 'package:untitled/User.dart';
 import 'CreateProfile.dart';
+import 'Data.dart' as data;
 
 class Signup extends StatefulWidget {
   @override
@@ -18,7 +19,7 @@ class _Signup extends State<Signup> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _loginController = TextEditingController();
-
+  String loginError = '';
 
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
 
@@ -70,7 +71,7 @@ class _Signup extends State<Signup> {
           return "Pleas confirm password";
         }
         if(_passwordController.text != _confirmPasswordController.text){
-          return "Password do not match";
+          return "Passwords do not match";
         }
         return null;
       },
@@ -85,14 +86,24 @@ class _Signup extends State<Signup> {
         onPressed: (){
           if(_formKey.currentState.validate())
           {
-            createLogin( _loginController.text ,_passwordController.text);
-            return  Navigator
-                .push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => CreateProfile()
-                )
-            );
+            Future<String> id = createLogin( _loginController.text ,_passwordController.text);
+            id.then((i) {
+              setState((){
+                if (i == '-1') {
+                loginError = 'Login already exists';
+              } else {
+                loginError = '';
+                data.id_s = i;
+                return  Navigator
+                    .push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CreateProfile()
+                    )
+                );
+              }
+              });
+            });
           }else
             {
               print("Unsuccessful");
@@ -142,7 +153,9 @@ class _Signup extends State<Signup> {
                         ),
                         SizedBox(height: 45.0),
                         emailField,
-                        SizedBox(height: 25.0),
+                        Text(loginError,
+                          style: TextStyle(color: Colors.red),),
+                        SizedBox(height: 12.0),
                         passwordField,
                         SizedBox(height: 25.0,),
                         repeatPasswordField,

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'Data.dart' as data;
+import 'package:untitled/User.dart';
+
 
 class ChangePassword extends StatefulWidget {
   @override
@@ -10,7 +13,9 @@ class _ChangePassword extends State<ChangePassword> {
   final _newPasswordController = TextEditingController();
   final _confirmNewPasswordController = TextEditingController();
   final _currentPasswordController = TextEditingController();
-
+  
+  String error = '';
+  
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
 
   @override
@@ -43,7 +48,7 @@ class _ChangePassword extends State<ChangePassword> {
           OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
       validator: (String value){
         if(value.isEmpty)
-          return "Pleas enter current new password";
+          return "Pleas enter new password";
         return null;
       },
     );
@@ -59,7 +64,7 @@ class _ChangePassword extends State<ChangePassword> {
           OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
       validator: (String value){
         if(value.isEmpty){
-          return "Pleas confirm password";
+          return "Please confirm password";
         }
         if(_newPasswordController.text != _confirmNewPasswordController.text){
           return "Password do not match";
@@ -78,8 +83,18 @@ class _ChangePassword extends State<ChangePassword> {
         onPressed: () {
           if(_formKey.currentState.validate())
           {
-            return Navigator
-                .pop(context);
+            Future<bool> pass = changePassword(data.id_s, _currentPasswordController.text, _newPasswordController.text);
+            pass.then((p) {
+              if (p) {
+               return Navigator
+                .pop(context); 
+              }
+              setState((){
+                if (!p) {
+                  error = 'Wrong current password';
+                }  
+              });
+            });
           }
         },
         child: Text("Save",
@@ -130,7 +145,9 @@ class _ChangePassword extends State<ChangePassword> {
                     ),
                     SizedBox(height: 45.0),
                     curentPassword,
-                    SizedBox(height: 25.0),
+                    Text(error,
+                      style: TextStyle(color: Colors.red),),
+                    SizedBox(height: 12.0),
                     newPassword,
                     SizedBox(height: 25.0,),
                     confirmNewPassword,

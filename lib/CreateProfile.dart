@@ -16,14 +16,9 @@ class _CreateProfile extends State<CreateProfile> {
   final _modelController = TextEditingController();
   final _plateController = TextEditingController();
 
-  String userName = "";
-  String userSurname = '';
-  String phoneNumber = '';
-  String carModel = '';
-  String registrationPlate = '';
 
 
-  _showDialog(TextEditingController controller, String variable, String text) async {
+  _showDialog(TextEditingController controller, String text) async {
     TextInputType keyboard = TextInputType.text;
     if(text == "Phone Number"){
       keyboard = TextInputType.number;
@@ -63,34 +58,21 @@ class _CreateProfile extends State<CreateProfile> {
 
   @override
   Widget build(BuildContext context) {
-    userName = _nameController.text;
-    userSurname = _surnameController.text;
-    phoneNumber = _phoneController.text;
-    carModel = _modelController.text;
-    registrationPlate = _plateController.text;
 
     final Avatar = CircleAvatar(
       radius: 50,
       backgroundImage: AssetImage('assets/profile.jpg'),
     );
 
-    final Name = Text(
-      userName + " " + userSurname,
-      style: TextStyle(
-        fontSize: 30,
-        fontWeight: FontWeight.bold,
-        color: Colors.white,
-      ),
-    );
 
     final BasicInformation = Text(
-      'Basic Information',
-      style: TextStyle(color: Colors.white, fontSize: 15),
+      '   Basic Information',
+      style: TextStyle(color: Colors.blue, fontSize: 15),
     );
 
     final CarInformation = Text(
-      'Car Information',
-      style: TextStyle(color: Colors.white, fontSize: 15),
+      '   Car Information',
+      style: TextStyle(color: Colors.blue, fontSize: 15),
     );
 
     final ChangeName = Container(
@@ -99,11 +81,11 @@ class _CreateProfile extends State<CreateProfile> {
       child: ListTile(
         title: Text('Name'),
         subtitle: Text(
-          userName,
+          _nameController.text,
           style: TextStyle(color: Colors.grey),
         ),
         onTap: () {
-          _showDialog(_nameController, userName, "Name");
+          _showDialog(_nameController, "Name");
         },
         leading: Icon(IconData(57438, fontFamily: 'MaterialIcons')),
       ),
@@ -115,11 +97,11 @@ class _CreateProfile extends State<CreateProfile> {
       child: ListTile(
         title: Text('Surname'),
         subtitle: Text(
-          userSurname,
+          _surnameController.text,
           style: TextStyle(color: Colors.grey),
         ),
         onTap: () {
-          _showDialog(_surnameController, userSurname, "Surname");
+          _showDialog(_surnameController,  "Surname");
         },
         leading: Icon(IconData(57438, fontFamily: 'MaterialIcons')),
       ),
@@ -131,11 +113,11 @@ class _CreateProfile extends State<CreateProfile> {
       child: ListTile(
         title: Text('Phone Number'),
         subtitle: Text(
-          phoneNumber,
+          _phoneController.text,
           style: TextStyle(color: Colors.grey,),
         ),
         onTap: () {
-          _showDialog(_phoneController, phoneNumber, "Phone Number");
+          _showDialog(_phoneController,  "Phone Number");
         },
         leading: Icon(IconData(57372, fontFamily: 'MaterialIcons')),
       ),
@@ -147,11 +129,11 @@ class _CreateProfile extends State<CreateProfile> {
       child: ListTile(
         title: Text('Car Model'),
         subtitle: Text(
-          carModel,
+          _modelController.text,
           style: TextStyle(color: Colors.grey),
         ),
         onTap: () {
-          _showDialog(_modelController, carModel, "Car Model");
+          _showDialog(_modelController, "Car Model");
         },
         leading: Icon(IconData(57664, fontFamily: 'MaterialIcons')),
       ),
@@ -163,14 +145,14 @@ class _CreateProfile extends State<CreateProfile> {
       child: ListTile(
         title: Text('Registration Plate'),
         subtitle: Text(
-          registrationPlate,
+          _plateController.text,
           style: TextStyle(color: Colors.grey),
         ),
         onTap: () {
           _showDialog(
-              _plateController, registrationPlate, "Registration Plate");
+              _plateController,  "Registration Plate");
         },
-        leading: Icon(IconData(58072, fontFamily: 'MaterialIcons')),
+        leading: Icon(Icons.wysiwyg),
       ),
     );
 
@@ -180,7 +162,7 @@ class _CreateProfile extends State<CreateProfile> {
           actions: [
             FlatButton(
               onPressed: () {
-                if (userName.isEmpty || userSurname.isEmpty || phoneNumber.isEmpty) {
+                if (_nameController.text.isEmpty || _surnameController.text.isEmpty || _phoneController.text.isEmpty) {
                      print("error");
                      showDialog<void>(
                        context: context,
@@ -201,6 +183,7 @@ class _CreateProfile extends State<CreateProfile> {
                         }
                      );
                 } else {
+                  createUser(data.id_s, _nameController.text, _surnameController.text, _phoneController.text);
                   return Navigator
                       .push(
                       context,
@@ -213,29 +196,31 @@ class _CreateProfile extends State<CreateProfile> {
               child: Text(
                 "Done",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 20,
                 ),
               ),
             )
           ],
-          backgroundColor: Colors.black,
+          backgroundColor: Colors.white,
           centerTitle: true,
           title: Text('Create Profile',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white)),
+              style: TextStyle(color: Colors.black)),
         ),
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.grey[200],
         body: Center(
           child: Form(
             key: _formKey,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                Avatar,
+                SizedBox(height: 15),
+                Center(
+                 child: Avatar,
+                ),
                 SizedBox(height: 25),
-                // Name,
-                //SizedBox(height: 35),
                 BasicInformation,
                 SizedBox(height: 5),
                 ChangeName,

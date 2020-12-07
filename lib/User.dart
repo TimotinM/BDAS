@@ -2,33 +2,23 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class User {
-    final int id;
-    final String login;
-    final String password;
+    final String id;
     final String name;
     final String surname;
     final String phone;
-    final Car car;
+    final String car_id;
 
-  User({this.id, this.login, this.password, this.name, this.surname, this.phone, this.car});
+  User({this.id,  this.name, this.surname, this.phone, this.car_id});
 
   factory User.fromJson(Map<String, dynamic> json){
     return User(
       id: json['id'],
-      login: json['login'],
-      password: json['password'],
       name: json['name'],
       surname: json['surname'],
       phone: json['phone'],
-      car: json['car'],
+      car_id: json['car_id'],
     );
   }
-
-  Map<String, dynamic> loginToJson() =>
-      {
-        'login': login,
-        'password': password,
-      };
 }
 
 
@@ -43,10 +33,10 @@ class Car{
 }
 
 Future<User> fetchUser(String id) async {
-  final response = await http.get('https://hitchhikeapi.heroku.com/api/users/' + id);
+  final response = await http.get('https://hitchhikeapi.herokuapp.com/api/users/' + id);
 
   if (response.statusCode == 200) {
-
+    print(response.body);
     return User.fromJson(jsonDecode(response.body));
   } else {
     // If the server did not return a 200 OK response,
@@ -55,49 +45,55 @@ Future<User> fetchUser(String id) async {
   }
 }
 
-Future<User> createLogin(String login, String password) async {
+Future<String> createLogin(String login, String password) async {
 
+  final http.Response response = await http.post(
+    'https://hitchhikeapi.herokuapp.com/api/login?login=' + login + '&password=' + password);
+
+  if (response.statusCode == 400)
+    return '-1';
+  return response.body;
+
+}
+
+Future<bool> createUser(String id, String name, String surname, String phone) async {
   final http.Response response = await http.post(
     'https://hitchhikeapi.herokuapp.com/api/users',
     headers: <String , String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },
     body: jsonEncode(<String, String>{
-      'login': login,
-      'password': password,
-      'name': 'name',
-      'surname': 'surname',
-      'phone': 'phone',
+      'id': id,
+      'name': name,
+      'surname': surname,
+      'phone': phone,
       'car': null,
     }),
   );
   if (response.statusCode == 201) {
-    return User.fromJson(jsonDecode(response.body));
+    return true;
   } else {
-    throw Exception('Failed to create album.');
+    return false;
   }
 }
 
-Future<User> updateUser() async {
-
-  final http.Response response = await http.post(
-    'https://hitchhikeapi.herokuapp.com/api/users/' + 'id',
+Future<bool> updateUser(String id, String name, String surname, String phone) async {
+  final http.Response response = await http.put(
+    'https://hitchhikeapi.herokuapp.com/api/users/' + id,
     headers: <String , String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },
     body: jsonEncode(<String, String>{
-      'login': 'login',
-      'password': 'password',
-      'name': 'name',
-      'surname': 'surname',
-      'phone': 'phone',
+      'name': name,
+      'surname': surname,
+      'phone': phone,
       'car': null,
     }),
   );
-  if (response.statusCode == 201) {
-    return User.fromJson(jsonDecode(response.body));
+  if (response.statusCode == 200) {
+    return true;
   } else {
-    throw Exception('Failed to create album.');
+    return false;
   }
 }
 
@@ -113,5 +109,22 @@ Future<String> verifyLogin(String login, String password) async {
   }
 }
 
+Future<bool> changePassword(String id, String password, String newPass) async {
+  final http.Response response = await http.patch(
+    'https://hitchhikeapi.herokuapp.com/api/login?id=' + id + '&password=' + password + '&new=' + newPass,
+  );
+  if (response.statusCode == 400) {
+    return false;
+  }
+  return true;
+}
 
-
+Future<bool> sendDriverRoute(String id, String json) async {
+  final http.Response req = await http.post(
+    'https://hitchhikeapi.herokuapp.com/api/drivers?id=' + id,
+  headers: <String , String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+  },
+  body: json
+  );
+}

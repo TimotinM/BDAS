@@ -71,11 +71,13 @@ class _Login extends State<Login> {
 
             var login = _loginController.text;
             var password = _passwordController.text;
-            Future<String> id= verifyLogin(login, password);
+            data.id = verifyLogin(login, password);
+            
 
-            id.then((id) {
+            data.id.then((id) {
               if (id != "-1") {
                 data.user = fetchUser(id);
+                data.id_s = id;
                 return Navigator
                 .push(
                 context,

@@ -1,4 +1,8 @@
+//import 'dart:html';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:untitled/HomePage.dart';
 import 'package:untitled/User.dart';
 import 'Data.dart' as data;
@@ -16,14 +20,29 @@ class _EditProfile extends State<EditProfile> {
   final _modelController = TextEditingController();
   final _plateController = TextEditingController();
 
-  String userName = "";
-  String userSurname = '';
-  String phoneNumber = '';
-  String carModel = '';
-  String registrationPlate = '';
+ /* File _image;
 
+  _imgFromCamera() async {
+    File image = await ImagePicker.pickImage(
+        source: ImageSource.camera, imageQuality: 50
+    );
 
-  _showDialog(TextEditingController controller, String variable, String text) async {
+    setState(() {
+      _image = image;
+    });
+  }
+
+  _imgFromGallery() async {
+    File image = await  ImagePicker.pickImage(
+        source: ImageSource.gallery, imageQuality: 50
+    );
+
+    setState(() {
+      _image = image;
+    });
+  }*/
+
+  _showDialog(TextEditingController controller, String text) async {
     TextInputType keyboard = TextInputType.text;
     if(text == "Phone Number"){
       keyboard = TextInputType.number;
@@ -53,7 +72,8 @@ class _EditProfile extends State<EditProfile> {
           new FlatButton(
               child: const Text('SAVE'),
               onPressed: () {
-                setState(() {});
+                setState(() {
+                });
                 Navigator.pop(context);
               })
         ],
@@ -62,35 +82,39 @@ class _EditProfile extends State<EditProfile> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    userName = _nameController.text;
-    userSurname = _surnameController.text;
-    phoneNumber = _phoneController.text;
-    carModel = _modelController.text;
-    registrationPlate = _plateController.text;
+  void initState() {
+    super.initState();
+    data.user = fetchUser(data.id_s);
+    data.user.then((user) {
+      if(_nameController.text.isEmpty){
+        setState((){
+        _nameController.text = user.name;
+        _surnameController.text = user.surname;
+        _phoneController.text = user.phone;
+        });
+      }
+    });
+  }
 
+  @override
+  Widget build(BuildContext context) {
     final Avatar = CircleAvatar(
       radius: 50,
       backgroundImage: AssetImage('assets/profile.jpg'),
     );
 
-    final Name = Text(
-      userName + " " + userSurname,
-      style: TextStyle(
-        fontSize: 30,
-        fontWeight: FontWeight.bold,
-        color: Colors.white,
-      ),
-    );
+
 
     final BasicInformation = Text(
-      'Basic Information',
-      style: TextStyle(color: Colors.white, fontSize: 15),
+      '   Basic Information',
+      textAlign: TextAlign.start,
+      style: TextStyle(color: Colors.blue, fontSize: 15),
     );
 
     final CarInformation = Text(
-      'Car Information',
-      style: TextStyle(color: Colors.white, fontSize: 15),
+      '   Car Information',
+      textAlign: TextAlign.start,
+      style: TextStyle(color: Colors.blue, fontSize: 15),
     );
 
     final ChangeName = Container(
@@ -99,11 +123,12 @@ class _EditProfile extends State<EditProfile> {
       child: ListTile(
         title: Text('Name'),
         subtitle: Text(
-          userName,
+          _nameController.text,
           style: TextStyle(color: Colors.grey),
         ),
         onTap: () {
-          _showDialog(_nameController, userName, "Name");
+
+          _showDialog(_nameController, "Name");
         },
         leading: Icon(IconData(57438, fontFamily: 'MaterialIcons')),
       ),
@@ -115,11 +140,11 @@ class _EditProfile extends State<EditProfile> {
       child: ListTile(
         title: Text('Surname'),
         subtitle: Text(
-          userSurname,
+          _surnameController.text,
           style: TextStyle(color: Colors.grey),
         ),
         onTap: () {
-          _showDialog(_surnameController, userSurname, "Surname");
+          _showDialog(_surnameController, "Surname");
         },
         leading: Icon(IconData(57438, fontFamily: 'MaterialIcons')),
       ),
@@ -131,11 +156,11 @@ class _EditProfile extends State<EditProfile> {
       child: ListTile(
         title: Text('Phone Number'),
         subtitle: Text(
-          phoneNumber,
+          _phoneController.text,
           style: TextStyle(color: Colors.grey,),
         ),
         onTap: () {
-          _showDialog(_phoneController, phoneNumber, "Phone Number");
+          _showDialog(_phoneController,  "Phone Number");
         },
         leading: Icon(IconData(57372, fontFamily: 'MaterialIcons')),
       ),
@@ -147,11 +172,11 @@ class _EditProfile extends State<EditProfile> {
       child: ListTile(
         title: Text('Car Model'),
         subtitle: Text(
-          carModel,
+            _modelController.text,
           style: TextStyle(color: Colors.grey),
         ),
         onTap: () {
-          _showDialog(_modelController, carModel, "Car Model");
+          _showDialog(_modelController, "Car Model");
         },
         leading: Icon(IconData(57664, fontFamily: 'MaterialIcons')),
       ),
@@ -163,24 +188,24 @@ class _EditProfile extends State<EditProfile> {
       child: ListTile(
         title: Text('Registration Plate'),
         subtitle: Text(
-          registrationPlate,
+          _plateController.text,
           style: TextStyle(color: Colors.grey),
         ),
         onTap: () {
           _showDialog(
-              _plateController, registrationPlate, "Registration Plate");
+              _plateController, "Registration Plate");
         },
-        leading: Icon(IconData(58072, fontFamily: 'MaterialIcons')),
-      ),
+        leading: Icon(Icons.wysiwyg),
+      )
     );
 
-    return Scaffold(
+    return  Scaffold(
         resizeToAvoidBottomPadding: false,
         appBar: AppBar(
           actions: [
             FlatButton(
               onPressed: () {
-                if (userName.isEmpty || userSurname.isEmpty || phoneNumber.isEmpty) {
+                if (_surnameController.text.isEmpty || _nameController.text.isEmpty || _phoneController.text.isEmpty) {
                   print("error");
                   showDialog<void>(
                       context: context,
@@ -201,43 +226,48 @@ class _EditProfile extends State<EditProfile> {
                       }
                   );
                 } else {
-                  return Navigator
-                      .pop(context);
+                  updateUser(data.id_s, _nameController.text, _surnameController.text, _phoneController.text);
+
+                  return Navigator.pop(context);
                 }
               },
               child: Text(
                 "Done",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 20,
                 ),
               ),
             )
           ],
-          backgroundColor: Colors.black,
+          backgroundColor: Colors.white,
           centerTitle: true,
           title: Text('Edit Profile',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white)),
+              style: TextStyle(color: Colors.black)),
           leading: FlatButton(
-            textColor: Colors.white,
+            textColor: Colors.black,
             child: Icon(
               Icons.arrow_back,
-              color: Colors.white,
+              color: Colors.black,
             ),
             onPressed: () {
               Navigator.pop(context);
             },
           ),
         ),
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.grey[200],
         body: Center(
           child: Form(
             key: _formKey,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                Avatar,
+                SizedBox(height: 10,),
+                Center(
+                  child:Avatar,
+                ),
                 SizedBox(height: 25),
                 // Name,
                 //SizedBox(height: 35),
@@ -258,5 +288,6 @@ class _EditProfile extends State<EditProfile> {
             ),
           ),
         ));
+   }
   }
-}
+

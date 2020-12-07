@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
@@ -6,6 +8,7 @@ import 'package:untitled/Options.dart';
 import 'Secret.dart';
 import 'Driver.dart';
 import 'Data.dart' as data;
+import 'User.dart';
 
 import 'dart:math' show cos, sqrt, asin;
 
@@ -32,7 +35,6 @@ class _MapViewState extends State<MapView> {
   String _startAddress = '';
   String _destinationAddress = '';
   String _placeDistance;
-  Driver  userr  = Driver();
 
   Icon fab = Icon(
     IconData(61806, fontFamily: 'MaterialIcons'),
@@ -257,12 +259,17 @@ class _MapViewState extends State<MapView> {
           _placeDistance = totalDistance.toStringAsFixed(2);
           print('DISTANCE: $_placeDistance km');
         });
-
+        if(data.isDriver){
+          data.id.then((i) {
+          sendDriverRoute(i, jsonEncode(polylineCoordinates));
+          });
+        }
         return true;
       }
     } catch (e) {
       print(e);
     }
+
     return false;
   }
 
@@ -387,20 +394,20 @@ class _MapViewState extends State<MapView> {
                           child: fab,
                         ),
                         onTap: () => setState((){
-                                if(userr.isDriver){
+                                if(data.isDriver){
                                   fab = Icon(
                                       IconData(61813, fontFamily: 'MaterialIcons'),
                                       color: Colors.black,
                                       size: 56
                                   );
-                                  userr.isDriver = false;
+                                  data.isDriver = false;
                                 }else{
                                   fab = Icon(
                                       IconData(61806, fontFamily: 'MaterialIcons'),
                                       color: Colors.black,
                                       size: 56,
                                   );
-                                  userr.isDriver = true;
+                                  data.isDriver = true;
                                 }
                                 },
                         )),
@@ -484,9 +491,10 @@ class _MapViewState extends State<MapView> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     FloatingActionButton(
-                      onPressed: (_startAddress != '' &&
-                          _destinationAddress != '')
-                          ? () async {
+                      onPressed: ()
+                        {
+                         if(_startAddress != '' &&
+                             _destinationAddress != '') {
                         setState(() {
                           if (markers.isNotEmpty) markers.clear();
                           if (polylines.isNotEmpty)
@@ -495,12 +503,10 @@ class _MapViewState extends State<MapView> {
                             polylineCoordinates.clear();
                           _placeDistance = null;
                         });
-                        print(data.user);
-
                         _calculateDistance();
+                         }
                         Navigator.of(context).pop();
-                      }
-                          : null,
+                      },
                       elevation: 3,
                       backgroundColor: Colors.black,
                       child: Icon(Icons.arrow_downward_rounded),
