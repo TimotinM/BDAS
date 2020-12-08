@@ -132,6 +132,32 @@ class _Options extends State<Options>{
         ),
       );
 
+      final darkMap = Container (
+        height: 50,
+        color: Colors.white,
+        child: Row(
+          children: <Widget>[
+            SizedBox(width: 16),
+            Icon(Icons.lightbulb_outline),
+            SizedBox(width: 20),
+            Text(
+                'Map dark mode',
+                 style: TextStyle(fontSize: 17),
+            ),
+            SizedBox(width: MediaQuery.of(context).size.width*0.35),
+            CupertinoSwitch(
+                activeColor: Colors.black,
+                value: data.dark,
+                onChanged: (value){
+                  setState(() {
+                    data.dark = !data.dark;
+                  });
+                }
+            )
+          ],
+        ),
+      );
+
       return Scaffold(
         //backgroundColor: Colors.grey,
         appBar: AppBar(
@@ -187,6 +213,8 @@ class _Options extends State<Options>{
                   startRadius,
                   SizedBox(height: 2.0),
                   endRadius,
+                  SizedBox(height: 20),
+                  darkMap,
                 ],
               ),
             ),

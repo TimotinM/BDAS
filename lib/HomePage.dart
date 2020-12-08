@@ -24,7 +24,6 @@ class _MapViewState extends State<MapView> {
   GoogleMapController mapController;
 
   bool isMapCreated = false;
-  bool dark = false;
 
 
 
@@ -44,11 +43,7 @@ class _MapViewState extends State<MapView> {
   Color color = Colors.black;
   Color notColor = Colors.white;
 
-  Icon fab = Icon(
-    IconData(61806, fontFamily: 'MaterialIcons'),
-    color: Colors.black,
-    size: 56,
-  );
+  Icon fab;
 
   Icon fabMap = Icon(
     Icons.lightbulb,
@@ -347,7 +342,7 @@ class _MapViewState extends State<MapView> {
   }
 
   changeMapMode(){
-    if(dark)
+    if(data.dark)
       getJsonFile('assets/Dark.json').then(setMapStyle);
     else
       getJsonFile('assets/Standart.json').then(setMapStyle);
@@ -366,14 +361,34 @@ class _MapViewState extends State<MapView> {
     super.initState();
     _getCurrentLocation();
     data.loading = false;
-    dark = false;
   }
 
   @override
   Widget build(BuildContext context) {
     if(isMapCreated)
-      changeMapMode();
 
+      changeMapMode();
+    if(data.dark){
+      color = Colors.white;
+      notColor = Colors.black;
+    }else{
+      color = Colors.black;
+      notColor = Colors.white;
+    }
+
+    if(data.isDriver) {
+      fab = Icon(
+        IconData(61806, fontFamily: 'MaterialIcons'),
+        color: color,
+        size: 56,
+      );
+    }else{
+      fab = Icon(
+          IconData(61813, fontFamily: 'MaterialIcons'),
+          color: color,
+          size: 56
+      );
+    }
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     return WillPopScope(
@@ -458,18 +473,8 @@ class _MapViewState extends State<MapView> {
                         ),
                         onTap: () => setState((){
                                 if(data.isDriver){
-                                  fab = Icon(
-                                      IconData(61813, fontFamily: 'MaterialIcons'),
-                                      color: color,
-                                      size: 56
-                                  );
                                   data.isDriver = false;
                                 }else{
-                                  fab = Icon(
-                                      IconData(61806, fontFamily: 'MaterialIcons'),
-                                      color: color,
-                                      size: 56,
-                                  );
                                   data.isDriver = true;
                                 }
                                 },
@@ -480,48 +485,7 @@ class _MapViewState extends State<MapView> {
                 ),
               ),
 
-                SafeArea(
-                  child: Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 10.0, bottom: 10.0),
-                      child: ClipOval(
-                        child: Material(
-                          color: Colors.transparent, // button color
-                          child: InkWell(
-                              splashColor: Colors.transparent, // inkwell color
-                              child: SizedBox(
-                                width: 56,
-                                height: 56,
-                                child: fabMap,
-                              ),
-                              onTap: () => setState((){
-                                if(dark){
-                                  color = Colors.black;
-                                  notColor = Colors.white;
-                                  fabMap = Icon(
-                                      Icons.lightbulb,
-                                      color: color,
-                                      size: 56
-                                  );
-                                  dark = false;
-                                }else{
-                                  color = Colors.white;
-                                  notColor = Colors.black;
-                                  fabMap = Icon(
-                                    Icons.lightbulb,
-                                    color: color,
-                                    size: 56,
-                                  );
-                                  dark = true;
-                                }
-                              },
-                              )),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+
           ],
         ),
         floatingActionButton: FloatingActionButton(
@@ -627,7 +591,11 @@ class _MapViewState extends State<MapView> {
                     IconButton(
                       icon: Icon(Icons.settings, color: Colors.black, size: 35),
                       onPressed: (){
-                        Navigator.of(context).pushNamed('/settings');
+                        Navigator.of(context).pushNamed('/settings')
+                        .then((value){
+                          setState(() {
+                          });
+                        });
                       },
                     ),
                   ],

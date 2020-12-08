@@ -10,3 +10,4 @@ Future<User> user;
 bool isLoggedIn = false;
 bool loading = false;
 bool isDriver = true;
+bool dark = false;
