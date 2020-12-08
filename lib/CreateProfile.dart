@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/HomePage.dart';
 import 'package:untitled/User.dart';
+import 'package:untitled/loading.dart';
 import 'Data.dart' as data;
 
 class CreateProfile extends StatefulWidget {
@@ -58,6 +59,8 @@ class _CreateProfile extends State<CreateProfile> {
 
   @override
   Widget build(BuildContext context) {
+    if(!data.isLoggedIn)
+      Navigator.of(context).pop();
 
     final Avatar = CircleAvatar(
       radius: 50,
@@ -156,13 +159,19 @@ class _CreateProfile extends State<CreateProfile> {
       ),
     );
 
-    return Scaffold(
+    return data.loading? Loading() :Scaffold(
         resizeToAvoidBottomPadding: false,
         appBar: AppBar(
           actions: [
             FlatButton(
               onPressed: () {
+                setState(() {
+                  data.loading = true;
+                });
                 if (_nameController.text.isEmpty || _surnameController.text.isEmpty || _phoneController.text.isEmpty) {
+                     setState(() {
+                       data.loading = false;
+                     });
                      print("error");
                      showDialog<void>(
                        context: context,
@@ -184,13 +193,10 @@ class _CreateProfile extends State<CreateProfile> {
                      );
                 } else {
                   createUser(data.id_s, _nameController.text, _surnameController.text, _phoneController.text);
-                  return Navigator
-                      .push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>MapView()
-                      )
-                  );
+                  setState(() {
+                    data.isLoggedIn = false;
+                  });
+                  return Navigator.of(context).pushNamed('/homePage');
                 }
               },
               child: Text(

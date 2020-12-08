@@ -5,6 +5,8 @@ import 'package:untitled/ChangePassword.dart';
 import 'package:untitled/CreateProfile.dart';
 import 'package:untitled/Driver.dart';
 import 'package:untitled/EditProfile.dart';
+import 'package:untitled/Login.dart';
+import 'Data.dart' as data;
 
 class Options extends StatefulWidget {
   @override
@@ -112,13 +114,7 @@ class _Options extends State<Options>{
           title: Text('Edit Profile'),
           trailing: Icon(Icons.keyboard_arrow_right),
           onTap: () {
-            Navigator
-                .push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => EditProfile()
-                )
-            );
+            Navigator.of(context).pushNamed('/editProfile');
           },
           leading: Icon(IconData(57360, fontFamily: 'MaterialIcons')),
         ),
@@ -130,13 +126,7 @@ class _Options extends State<Options>{
           title: Text('Change Password'),
           trailing: Icon(Icons.keyboard_arrow_right),
           onTap: () {
-            Navigator
-                .push(
-                context,
-                MaterialPageRoute(
-                builder: (context) => ChangePassword()
-              )
-            );
+            Navigator.of(context).pushNamed('/changePassword');
           },
           leading: Icon(IconData(58625, fontFamily: 'MaterialIcons')),
         ),
@@ -145,6 +135,24 @@ class _Options extends State<Options>{
       return Scaffold(
         //backgroundColor: Colors.grey,
         appBar: AppBar(
+          actions: [
+            FlatButton(
+                onPressed: (){
+                  data.isLoggedIn = false;
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (BuildContext context) => Login()),
+                      ModalRoute.withName('/')
+                  );
+                },
+                child: Row(
+                  children: <Widget>[
+                     Text('Logout'),
+                     Icon(Icons.logout),
+                  ],
+                ),
+            )
+          ],
           backgroundColor: Colors.white,
           centerTitle: true,
           title: Text('Settings', style: TextStyle(color: Colors.black),),

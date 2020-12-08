@@ -1,5 +1,7 @@
 
+import 'loading.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:untitled/HomePage.dart';
 import 'package:untitled/Signup.dart';
 import 'package:untitled/User.dart';
@@ -14,18 +16,13 @@ class _Login extends State<Login> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
   final _loginController = TextEditingController();
-
   String loginError = '';
 
 
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
    Future<User> futureUser;
-   
- /* @override
-  void initState() {
-    super.initState();
-    futureUser = fetchUser();
-  }*/
+
+
   Widget build(BuildContext context) {
 
     final emailField = TextFormField(
@@ -68,7 +65,9 @@ class _Login extends State<Login> {
         onPressed: () {
           if(_formKey.currentState.validate())
           {
-
+            setState(() {
+              data.loading = true;
+            });
             var login = _loginController.text;
             var password = _passwordController.text;
             data.id = verifyLogin(login, password);
@@ -76,18 +75,14 @@ class _Login extends State<Login> {
 
             data.id.then((id) {
               if (id != "-1") {
+                data.isLoggedIn = true;
                 data.user = fetchUser(id);
                 data.id_s = id;
-                return Navigator
-                .push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => MapView()
-                )
-                );
+                return Navigator.of(context).pushNamed('/homePage');
               } else {
                 setState((){
                   loginError = 'Login Failed';
+                  data.loading = false;
                 });
               }
 
@@ -95,6 +90,8 @@ class _Login extends State<Login> {
                 print(e);
 
             });
+          }else{
+            data.loading = false;
           }
         },
         child: Text("Login",
@@ -106,13 +103,7 @@ class _Login extends State<Login> {
 
     final singUp = FlatButton(
         onPressed: () {
-          Navigator
-              .push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => Signup()
-              )
-          );
+          Navigator.of(context).pushNamed('/signup');
         },
         child: Text(
         "Signup",
@@ -123,7 +114,7 @@ class _Login extends State<Login> {
       ),
     );
 
-    return Scaffold(
+    return data.loading? Loading() :Scaffold(
       body: Center(
          child: Container(
           color: Colors.white,

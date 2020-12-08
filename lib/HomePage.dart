@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -35,12 +36,36 @@ class _MapViewState extends State<MapView> {
   String _startAddress = '';
   String _destinationAddress = '';
   String _placeDistance;
+  String _previousStartAddress = '';
+  String _previousDestinationAddress = '';
 
   Icon fab = Icon(
     IconData(61806, fontFamily: 'MaterialIcons'),
     color: Colors.black,
     size: 56,
   );
+
+  Future<bool> _onWillPop() {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Are you sure?'),
+        content: Text('Do you want to exit an App'),
+        actions: <Widget>[
+          FlatButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('No'),
+          ),
+          FlatButton(
+            onPressed: () => SystemNavigator.pop(),
+            /*Navigator.of(context).pop(true)*/
+            child: Text('Yes'),
+          ),
+        ],
+      ),
+    ) ??
+        false;
+  }
 
   Set<Marker> markers = {};
 
@@ -314,22 +339,25 @@ class _MapViewState extends State<MapView> {
   void initState() {
     super.initState();
     _getCurrentLocation();
+    data.loading = false;
   }
 
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    return Container(
-      height: height,
-      width: width,
-      child: Scaffold(
-        resizeToAvoidBottomPadding: false,
-        key: _scaffoldKey,
-        body: Stack(
-          children: <Widget>[
-            // Map View
-            GoogleMap(
+    return WillPopScope(
+        onWillPop: _onWillPop,
+        child:Container(
+        height: height,
+          width: width,
+          child: Scaffold(
+            resizeToAvoidBottomPadding: false,
+            key: _scaffoldKey,
+            body: Stack(
+              children: <Widget>[
+              // Map View
+              GoogleMap(
               polylines: Set<Polyline>.of(polylines.values),
               markers: markers != null ? Set<Marker>.from(markers) : null,
               initialCameraPosition: _initialLocation,
@@ -428,6 +456,7 @@ class _MapViewState extends State<MapView> {
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
+      )
     );
 
   }
@@ -471,6 +500,7 @@ class _MapViewState extends State<MapView> {
                     locationCallback: (String value) {
                       setState(() {
                         _startAddress = value;
+
                       });
                     }),
                 SizedBox(height: 10),
@@ -494,7 +524,9 @@ class _MapViewState extends State<MapView> {
                       onPressed: ()
                         {
                          if(_startAddress != '' &&
-                             _destinationAddress != '') {
+                             _destinationAddress != '' &&
+                             (_previousStartAddress != _startAddress ||
+                             _previousDestinationAddress != _destinationAddress)) {
                         setState(() {
                           if (markers.isNotEmpty) markers.clear();
                           if (polylines.isNotEmpty)
@@ -505,6 +537,8 @@ class _MapViewState extends State<MapView> {
                         });
                         _calculateDistance();
                          }
+                         _previousStartAddress = _startAddress;
+                         _previousDestinationAddress = _destinationAddress;
                         Navigator.of(context).pop();
                       },
                       elevation: 3,
@@ -515,13 +549,7 @@ class _MapViewState extends State<MapView> {
                     IconButton(
                       icon: Icon(Icons.settings, color: Colors.black, size: 35),
                       onPressed: (){
-                        Navigator
-                            .push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => Options()
-                            )
-                        );
+                        Navigator.of(context).pushNamed('/settings');
                       },
                     ),
                   ],

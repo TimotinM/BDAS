@@ -88,26 +88,20 @@ class _Signup extends State<Signup> {
           {
             Future<String> id = createLogin( _loginController.text ,_passwordController.text);
             id.then((i) {
-              setState((){
                 if (i == '-1') {
-                loginError = 'Login already exists';
+                  setState(() {
+                    loginError = 'Login already exists';
+                  });
               } else {
-                loginError = '';
-                data.id_s = i;
-                return  Navigator
-                    .push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => CreateProfile()
-                    )
-                );
+                setState(() {
+                  loginError = '';
+                  data.id_s = i;
+                });
+                print('log');
+                Navigator.of(context).pushNamed('/createProfile');
               }
-              });
             });
-          }else
-            {
-              print("Unsuccessful");
-            }
+          }
         },
         child: Text("Signup",
             textAlign: TextAlign.center,
