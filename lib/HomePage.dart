@@ -55,8 +55,7 @@ class _MapViewState extends State<MapView> {
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Are you sure?'),
-        content: Text('Do you want to exit an App'),
+        title: Text('Do you want to close the app?'),
         actions: <Widget>[
           FlatButton(
             onPressed: () => Navigator.of(context).pop(false),
