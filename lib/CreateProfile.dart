@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:untitled/HomePage.dart';
 import 'package:untitled/User.dart';
 import 'package:untitled/loading.dart';
 import 'Data.dart' as data;
@@ -59,8 +58,6 @@ class _CreateProfile extends State<CreateProfile> {
 
   @override
   Widget build(BuildContext context) {
-    if(!data.isLoggedIn)
-      Navigator.of(context).pop();
 
     final Avatar = CircleAvatar(
       radius: 50,
@@ -193,9 +190,6 @@ class _CreateProfile extends State<CreateProfile> {
                      );
                 } else {
                   createUser(data.id_s, _nameController.text, _surnameController.text, _phoneController.text);
-                  setState(() {
-                    data.isLoggedIn = false;
-                  });
                   return Navigator.of(context).pushNamed('/homePage');
                 }
               },

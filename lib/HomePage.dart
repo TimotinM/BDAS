@@ -5,9 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:untitled/Options.dart';
 import 'Secret.dart';
-import 'Driver.dart';
 import 'Data.dart' as data;
 import 'User.dart';
 
@@ -25,6 +23,11 @@ class _MapViewState extends State<MapView> {
   CameraPosition _initialLocation = CameraPosition(target: LatLng(0.0, 0.0));
   GoogleMapController mapController;
 
+  bool isMapCreated = false;
+  bool dark = false;
+
+
+
   final Geolocator _geolocator = Geolocator();
 
   Position _currentPosition;
@@ -38,9 +41,17 @@ class _MapViewState extends State<MapView> {
   String _placeDistance;
   String _previousStartAddress = '';
   String _previousDestinationAddress = '';
+  Color color = Colors.black;
+  Color notColor = Colors.white;
 
   Icon fab = Icon(
     IconData(61806, fontFamily: 'MaterialIcons'),
+    color: Colors.black,
+    size: 56,
+  );
+
+  Icon fabMap = Icon(
+    Icons.lightbulb,
     color: Colors.black,
     size: 56,
   );
@@ -335,15 +346,34 @@ class _MapViewState extends State<MapView> {
     polylines[id] = polyline;
   }
 
+  changeMapMode(){
+    if(dark)
+      getJsonFile('assets/Dark.json').then(setMapStyle);
+    else
+      getJsonFile('assets/Standart.json').then(setMapStyle);
+  }
+
+  Future<String> getJsonFile(String path) async{
+    return await rootBundle.loadString(path);
+  }
+
+  void setMapStyle(String mapStyle){
+    mapController.setMapStyle(mapStyle);
+  }
+
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
     data.loading = false;
+    dark = false;
   }
 
   @override
   Widget build(BuildContext context) {
+    if(isMapCreated)
+      changeMapMode();
+
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     return WillPopScope(
@@ -368,6 +398,11 @@ class _MapViewState extends State<MapView> {
               zoomControlsEnabled: false,
               onMapCreated: (GoogleMapController controller) {
                 mapController = controller;
+                isMapCreated = true;
+                changeMapMode();
+                setState(() {
+
+                });
               },
             ),
 
@@ -378,13 +413,13 @@ class _MapViewState extends State<MapView> {
                   padding: const EdgeInsets.only(right: 10.0, bottom: 10.0),
                   child: ClipOval(
                     child: Material(
-                      color: Colors.black, // button color
+                      color: color, // button color
                       child: InkWell(
                         splashColor: Colors.grey[900], // inkwell color
                         child: SizedBox(
                           width: 56,
                           height: 56,
-                          child: Icon(Icons.my_location, color: Colors.white,),
+                          child: Icon(Icons.my_location, color: notColor),
                         ),
                         onTap: () {
                           mapController.animateCamera(
@@ -425,14 +460,14 @@ class _MapViewState extends State<MapView> {
                                 if(data.isDriver){
                                   fab = Icon(
                                       IconData(61813, fontFamily: 'MaterialIcons'),
-                                      color: Colors.black,
+                                      color: color,
                                       size: 56
                                   );
                                   data.isDriver = false;
                                 }else{
                                   fab = Icon(
                                       IconData(61806, fontFamily: 'MaterialIcons'),
-                                      color: Colors.black,
+                                      color: color,
                                       size: 56,
                                   );
                                   data.isDriver = true;
@@ -444,6 +479,49 @@ class _MapViewState extends State<MapView> {
                   ),
                 ),
               ),
+
+                SafeArea(
+                  child: Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 10.0, bottom: 10.0),
+                      child: ClipOval(
+                        child: Material(
+                          color: Colors.transparent, // button color
+                          child: InkWell(
+                              splashColor: Colors.transparent, // inkwell color
+                              child: SizedBox(
+                                width: 56,
+                                height: 56,
+                                child: fabMap,
+                              ),
+                              onTap: () => setState((){
+                                if(dark){
+                                  color = Colors.black;
+                                  notColor = Colors.white;
+                                  fabMap = Icon(
+                                      Icons.lightbulb,
+                                      color: color,
+                                      size: 56
+                                  );
+                                  dark = false;
+                                }else{
+                                  color = Colors.white;
+                                  notColor = Colors.black;
+                                  fabMap = Icon(
+                                    Icons.lightbulb,
+                                    color: color,
+                                    size: 56,
+                                  );
+                                  dark = true;
+                                }
+                              },
+                              )),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
           ],
         ),
         floatingActionButton: FloatingActionButton(
@@ -451,8 +529,8 @@ class _MapViewState extends State<MapView> {
             popUpMenu(context);
           },
           elevation: 3,
-          backgroundColor: Colors.black,
-          child: Icon(Icons.arrow_upward_rounded),
+          backgroundColor: color,
+          child: Icon(Icons.arrow_upward_rounded, color: notColor),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),

@@ -6,7 +6,6 @@ import 'package:untitled/HomePage.dart';
 import 'package:untitled/Login.dart';
 import 'package:untitled/Options.dart';
 import 'package:untitled/Signup.dart';
-import 'package:untitled/route_generator.dart';
 
 
 class RouteGenerator {
@@ -28,7 +27,7 @@ class RouteGenerator {
       case '/changePassword':
         return MaterialPageRoute(builder: (_) => ChangePassword());
       default:
-        return MaterialPageRoute(builder: (_) => Login());;
+        return MaterialPageRoute(builder: (_) => Login());
     }
   }
 }

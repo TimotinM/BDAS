@@ -1,9 +1,6 @@
 
 import 'loading.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:untitled/HomePage.dart';
-import 'package:untitled/Signup.dart';
 import 'package:untitled/User.dart';
 import 'Data.dart' as data;
 

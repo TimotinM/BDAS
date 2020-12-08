@@ -1,12 +1,7 @@
 
-//import 'dart:html';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:untitled/EditProfile.dart';
-import 'package:untitled/Login.dart';
 import 'package:untitled/User.dart';
-import 'CreateProfile.dart';
 import 'Data.dart' as data;
 
 class Signup extends StatefulWidget {
