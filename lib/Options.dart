@@ -57,6 +57,13 @@ class _Options extends State<Options>{
   }
 
   @override
+  void initState() {
+    super.initState();
+    _endRadiusController.text = '50';
+    _startRadiusController.text = '50';
+  }
+
+  @override
   Widget build(BuildContext context){
       final ariaSet = Text(
           "     Set Aria",
@@ -80,7 +87,7 @@ class _Options extends State<Options>{
         child: ListTile(
           title: Text("Start Radius"),
           subtitle: Text(
-              _startRadiusController.text,
+              _startRadiusController.text + ' m',
               style: TextStyle(color: Colors.grey),
           ),
           leading: Icon(IconData(61474, fontFamily: 'MaterialIcons')),
@@ -96,7 +103,7 @@ class _Options extends State<Options>{
         child: ListTile(
           title: Text("End Radius"),
           subtitle: Text(
-            _endRadiusController.text,
+            _endRadiusController.text + ' m',
             style: TextStyle(color: Colors.grey),
           ),
           leading: Icon(IconData(61474, fontFamily: 'MaterialIcons')),
@@ -151,6 +158,32 @@ class _Options extends State<Options>{
                 onChanged: (value){
                   setState(() {
                     data.dark = !data.dark;
+                  });
+                }
+            )
+          ],
+        ),
+      );
+
+      final driver = Container (
+        height: 50,
+        color: Colors.white,
+        child: Row(
+          children: <Widget>[
+            SizedBox(width: 16),
+            Icon(Icons.drive_eta_outlined),
+            SizedBox(width: 20),
+            Text(
+              " I'm a driver       ",
+              style: TextStyle(fontSize: 17),
+            ),
+            SizedBox(width: MediaQuery.of(context).size.width*0.35),
+            CupertinoSwitch(
+                activeColor: Colors.black,
+                value: data.isDriver,
+                onChanged: (value){
+                  setState(() {
+                    data.isDriver = !data.isDriver;
                   });
                 }
             )
@@ -215,6 +248,8 @@ class _Options extends State<Options>{
                   endRadius,
                   SizedBox(height: 20),
                   darkMap,
+                  SizedBox(height: 2),
+                  driver
                 ],
               ),
             ),

@@ -1,0 +1,137 @@
+[{
+  "image": {
+    "name": "/home/imagqljr/public_html/imageconvert.org/public/uploads/carMarker1607514866.json",
+    "baseName": "carMarker.png",
+    "format": "json",
+    "formatDescription": "json",
+    "mimeType": "application/json",
+    "class": "DirectClass",
+    "geometry": {
+      "width": 36,
+      "height": 36,
+      "x": 0,
+      "y": 0
+    },
+    "units": "Undefined",
+    "type": "Bilevel",
+    "baseType": "Undefined",
+    "endianness": "Undefined",
+    "colorspace": "sRGB",
+    "depth": 8,
+    "baseDepth": 8,
+    "channelDepth": {
+      "alpha": 8,
+      "red": 1,
+      "green": 1,
+      "blue": 8
+    },
+    "pixels": 5184,
+    "imageStatistics": {
+      "Overall": {
+        "min": 0,
+        "max": 255,
+        "mean": 19.5033,
+        "standardDeviation": 7045.09,
+        "kurtosis": 8.34414,
+        "skewness": 3.16427,
+        "entropy": 0.0823253
+      }
+    },
+    "channelStatistics": {
+      "Alpha": {
+        "min": 0,
+        "max": 255,
+        "mean": 78.0131,
+        "standardDeviation": 28180.4,
+        "kurtosis": -1.16387,
+        "skewness": 0.827821,
+        "entropy": 0.329301
+      },
+      "Red": {
+        "min": 0,
+        "max": 0,
+        "mean": 0,
+        "standardDeviation": 0,
+        "kurtosis": -3,
+        "skewness": 0,
+        "entropy": 0
+      },
+      "Green": {
+        "min": 0,
+        "max": 0,
+        "mean": 0,
+        "standardDeviation": 0,
+        "kurtosis": -3,
+        "skewness": 0,
+        "entropy": 0
+      },
+      "Blue": {
+        "min": 0,
+        "max": 0,
+        "mean": 0,
+        "standardDeviation": 0,
+        "kurtosis": -3,
+        "skewness": 0,
+        "entropy": 0
+      }
+    },
+    "alpha": "#00000000",
+    "renderingIntent": "Perceptual",
+    "gamma": 0.454545,
+    "chromaticity": {
+      "redPrimary": {
+        "x": 0.64,
+        "y": 0.33
+      },
+      "greenPrimary": {
+        "x": 0.3,
+        "y": 0.6
+      },
+      "bluePrimary": {
+        "x": 0.15,
+        "y": 0.06
+      },
+      "whitePrimary": {
+        "x": 0.3127,
+        "y": 0.329
+      }
+    },
+    "matteColor": "#BDBDBD",
+    "backgroundColor": "#FFFFFF",
+    "borderColor": "#DFDFDF",
+    "transparentColor": "#00000000",
+    "interlace": "None",
+    "intensity": "Undefined",
+    "compose": "Over",
+    "pageGeometry": {
+      "width": 36,
+      "height": 36,
+      "x": 0,
+      "y": 0
+    },
+    "dispose": "Undefined",
+    "iterations": 0,
+    "compression": "Zip",
+    "orientation": "Undefined",
+    "properties": {
+      "date:create": "2020-12-09T11:54:24+00:00",
+      "date:modify": "2020-12-09T11:54:24+00:00",
+      "png:IHDR.bit-depth-orig": "8",
+      "png:IHDR.bit_depth": "8",
+      "png:IHDR.color-type-orig": "6",
+      "png:IHDR.color_type": "6 (RGBA)",
+      "png:IHDR.interlace_method": "0 (Not interlaced)",
+      "png:IHDR.width,height": "36, 36",
+      "png:sRGB": "intent=0 (Perceptual Intent)",
+      "signature": "0807719f6892c87d8729c66d92372e906b281ef1c8cf248e54644a6eee41e96f"
+    },
+    "tainted": false,
+    "filesize": "0B",
+    "numberPixels": "1296",
+    "pixelsPerSecond": "992031B",
+    "userTime": "0.000u",
+    "elapsedTime": "0:01.001",
+    "version": "file:///opt/alt/alt-ImageMagick/usr/share/doc/ImageMagick-7/index.html"
+  }
+}
+]

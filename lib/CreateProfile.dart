@@ -169,7 +169,6 @@ class _CreateProfile extends State<CreateProfile> {
                      setState(() {
                        data.loading = false;
                      });
-                     print("error");
                      showDialog<void>(
                        context: context,
                        barrierDismissible: false, // user must tap button!

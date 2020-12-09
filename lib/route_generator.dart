@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/ChangePassword.dart';
 import 'package:untitled/CreateProfile.dart';
+import 'package:untitled/DriverDialog.dart';
 import 'package:untitled/EditProfile.dart';
 import 'package:untitled/HomePage.dart';
 import 'package:untitled/Login.dart';
@@ -26,6 +27,8 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => EditProfile());
       case '/changePassword':
         return MaterialPageRoute(builder: (_) => ChangePassword());
+      case '/driverInformation':
+        return MaterialPageRoute(builder: (context) => DriverDialog());
       default:
         return MaterialPageRoute(builder: (_) => Login());
     }

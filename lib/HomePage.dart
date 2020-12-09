@@ -1,10 +1,12 @@
 import 'dart:convert';
-
+import 'Driver.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:untitled/DriverDialog.dart';
 import 'Secret.dart';
 import 'Data.dart' as data;
 import 'User.dart';
@@ -20,13 +22,14 @@ class MapView extends StatefulWidget {
 }
 
 class _MapViewState extends State<MapView> {
+  var driverList = List<Driver>();
   CameraPosition _initialLocation = CameraPosition(target: LatLng(0.0, 0.0));
   GoogleMapController mapController;
 
   bool isMapCreated = false;
-
-
-
+ var driver = new Driver();
+  var driver1 = new Driver(name:'Vasile', surname:'Kop', Lat:46.2);
+  var driver2 = new Driver(name:'Jora', surname:'Jug', Lat:46.4);
   final Geolocator _geolocator = Geolocator();
 
   Position _currentPosition;
@@ -72,7 +75,9 @@ class _MapViewState extends State<MapView> {
         false;
   }
 
+
   Set<Marker> markers = {};
+
 
   PolylinePoints polylinePoints;
   Map<PolylineId, Polyline> polylines = {};
@@ -116,7 +121,7 @@ class _MapViewState extends State<MapView> {
               Radius.circular(10.0),
             ),
             borderSide: BorderSide(
-              color: Colors.blue[300],
+              color: Colors.black,
               width: 2,
             ),
           ),
@@ -203,7 +208,7 @@ class _MapViewState extends State<MapView> {
           icon: BitmapDescriptor.defaultMarker,
         );
 
-        // Destination Location Marker
+
         Marker destinationMarker = Marker(
           markerId: MarkerId('$destinationCoordinates'),
           position: LatLng(
@@ -217,6 +222,8 @@ class _MapViewState extends State<MapView> {
           icon: BitmapDescriptor.defaultMarker,
         );
 
+
+
         // Adding the markers to the list
         markers.add(startMarker);
         markers.add(destinationMarker);
@@ -224,7 +231,7 @@ class _MapViewState extends State<MapView> {
         print('START COORDINATES: $startCoordinates');
         print('DESTINATION COORDINATES: $destinationCoordinates');
 
-      //  Position _northeastCoordinates;
+        //  Position _northeastCoordinates;
         //Position _southwestCoordinates;
 
         // Calculating to check that
@@ -291,7 +298,7 @@ class _MapViewState extends State<MapView> {
         });
         if(data.isDriver){
           data.id.then((i) {
-          sendDriverRoute(i, jsonEncode(polylineCoordinates));
+            sendDriverRoute(i, jsonEncode(polylineCoordinates));
           });
         }
         return true;
@@ -351,16 +358,66 @@ class _MapViewState extends State<MapView> {
     return await rootBundle.loadString(path);
   }
 
+
   void setMapStyle(String mapStyle){
     mapController.setMapStyle(mapStyle);
   }
+
+  BitmapDescriptor carIcon;
 
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
     data.loading = false;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => new AlertDialog(
+          title: new Text("Choose the type of user!"),
+          actions: <Widget>[
+            new IconButton(
+              icon: Icon(
+                     IconData(61806, fontFamily: 'MaterialIcons'),
+                     color: Colors.black,
+                     size: 46,
+              ),
+              onPressed: () {
+                setState(() {
+                  data.isDriver = true;
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+            SizedBox(width: 25),
+            new IconButton(
+              icon: Icon(
+                     IconData(61813, fontFamily: 'MaterialIcons'),
+                        color: Colors.black,
+                        size: 46,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        data.isDriver = false;
+                      });
+                      Navigator.of(context).pop();
+                    },
+            ),
+            SizedBox(width: 12)
+
+          ],
+        ),
+      );
+    });
+    BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(size: Size(100, 100)),
+        'assets/carMarker.png').then((onValue) {
+      carIcon = onValue;
+    });
+    driverList.add(driver1);
+    driverList.add(driver2);
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -393,111 +450,101 @@ class _MapViewState extends State<MapView> {
     return WillPopScope(
         onWillPop: _onWillPop,
         child:Container(
-        height: height,
+          height: height,
           width: width,
           child: Scaffold(
             resizeToAvoidBottomPadding: false,
             key: _scaffoldKey,
             body: Stack(
               children: <Widget>[
-              // Map View
-              GoogleMap(
-              polylines: Set<Polyline>.of(polylines.values),
-              markers: markers != null ? Set<Marker>.from(markers) : null,
-              initialCameraPosition: _initialLocation,
-              myLocationEnabled: true,
-              myLocationButtonEnabled: false,
-              mapType: MapType.normal,
-              zoomGesturesEnabled: true,
-              zoomControlsEnabled: false,
-              onMapCreated: (GoogleMapController controller) {
-                mapController = controller;
-                isMapCreated = true;
-                changeMapMode();
-                setState(() {
+                // Map View
+                GoogleMap(
+                  polylines: Set<Polyline>.of(polylines.values),
+                  markers: markers != null ? Set<Marker>.from(markers) : null,
+                  initialCameraPosition: _initialLocation,
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: false,
+                  mapType: MapType.normal,
+                  zoomGesturesEnabled: true,
+                  zoomControlsEnabled: false,
+                  onMapCreated: (GoogleMapController controller) {
+                    mapController = controller;
+                    isMapCreated = true;
+                    changeMapMode();
+                    setState(() {
 
-                });
-              },
-            ),
+                    });
+                  },
+                ),
 
-            SafeArea(
-              child: Align(
-                alignment: Alignment.bottomRight,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 10.0, bottom: 10.0),
-                  child: ClipOval(
-                    child: Material(
-                      color: color, // button color
-                      child: InkWell(
-                        splashColor: Colors.grey[900], // inkwell color
-                        child: SizedBox(
-                          width: 56,
-                          height: 56,
-                          child: Icon(Icons.my_location, color: notColor),
-                        ),
-                        onTap: () {
-                          mapController.animateCamera(
-                            CameraUpdate.newCameraPosition(
-                              CameraPosition(
-                                target: LatLng(
-                                  _currentPosition.latitude,
-                                  _currentPosition.longitude,
-                                ),
-                                zoom: 18.0,
-                              ),
+                SafeArea(
+                  child: Align(
+                    alignment: Alignment.bottomRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 10.0, bottom: 10.0),
+                      child: ClipOval(
+                        child: Material(
+                          color: color, // button color
+                          child: InkWell(
+                            splashColor: Colors.grey[900], // inkwell color
+                            child: SizedBox(
+                              width: 56,
+                              height: 56,
+                              child: Icon(Icons.my_location, color: notColor),
                             ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            SafeArea(
-              child: Align(
-                alignment: Alignment.topRight,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 10.0, top: 10.0),
-                  child: ClipOval(
-                    child: Material(
-                      color: Colors.transparent, // button color
-                      child: InkWell(
-                        splashColor: Colors.transparent, // inkwell color
-                        child: SizedBox(
-                          width: 56,
-                          height: 56,
-                          child: fab,
+                            onTap: () {
+                              mapController.animateCamera(
+                                CameraUpdate.newCameraPosition(
+                                  CameraPosition(
+                                    target: LatLng(
+                                      _currentPosition.latitude,
+                                      _currentPosition.longitude,
+                                    ),
+                                    zoom: 18.0,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                         ),
-                        onTap: () => setState((){
-                                if(data.isDriver){
-                                  data.isDriver = false;
-                                }else{
-                                  data.isDriver = true;
-                                }
-                                },
-                        )),
                       ),
                     ),
                   ),
                 ),
-              ),
+
+                SafeArea(
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 10.0, top: 10.0),
+                      child: ClipOval(
+                        child: Material(
+                          color: Colors.transparent, // button color
+                              child: SizedBox(
+                                width: 56,
+                                height: 56,
+                                child: fab,
+                              ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
 
 
-          ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: (){
-            popUpMenu(context);
-          },
-          elevation: 3,
-          backgroundColor: color,
-          child: Icon(Icons.arrow_upward_rounded, color: notColor),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      ),
-      )
+              ],
+            ),
+            floatingActionButton: FloatingActionButton(
+              onPressed: (){
+                popUpMenu(context);
+              },
+              elevation: 3,
+              backgroundColor: color,
+              child: Icon(Icons.arrow_upward_rounded, color: notColor),
+            ),
+            floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+          ),
+        )
     );
 
   }
@@ -509,100 +556,127 @@ class _MapViewState extends State<MapView> {
           padding: MediaQuery.of(context).viewInsets,
           duration: const Duration(milliseconds: 100),
           curve: Curves.decelerate,
-      child: Container(
+          child: Container(
 
-          height: 270,
-          decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              )
-          ),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-            child:Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget> [
-                SizedBox(height: 35),
-                _textField(
-                    label: 'Start',
-                    hint: 'Choose starting point',
-                    prefixIcon: Icon(Icons.looks_one),
-                    suffixIcon: IconButton(
-                      icon: Icon(Icons.my_location),
-                      onPressed: () {
-                        startAddressController.text = _currentAddress;
-                        _startAddress = _currentAddress;
-                      },
-                    ),
-                    controller: startAddressController,
-                    width: MediaQuery.of(context).size.width,
-                    locationCallback: (String value) {
-                      setState(() {
-                        _startAddress = value;
-
-                      });
-                    }),
-                SizedBox(height: 10),
-                _textField(
-                    label: 'Destination',
-                    hint: 'Choose destination',
-                    prefixIcon: Icon(Icons.looks_two),
-                    controller: destinationAddressController,
-                    width: MediaQuery.of(context).size.width,
-                    locationCallback: (String value) {
-                      setState(() {
-                        _destinationAddress = value;
-                      });
-                    }),
-                SizedBox(height: 50,),
-                Row(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    FloatingActionButton(
-                      onPressed: ()
-                        {
-                         if(_startAddress != '' &&
-                             _destinationAddress != '' &&
-                             (_previousStartAddress != _startAddress ||
-                             _previousDestinationAddress != _destinationAddress)) {
-                        setState(() {
-                          if (markers.isNotEmpty) markers.clear();
-                          if (polylines.isNotEmpty)
-                            polylines.clear();
-                          if (polylineCoordinates.isNotEmpty)
-                            polylineCoordinates.clear();
-                          _placeDistance = null;
-                        });
-                        _calculateDistance();
-                         }
-                         _previousStartAddress = _startAddress;
-                         _previousDestinationAddress = _destinationAddress;
-                        Navigator.of(context).pop();
-                      },
-                      elevation: 3,
-                      backgroundColor: Colors.black,
-                      child: Icon(Icons.arrow_downward_rounded),
-                    ),
-                    SizedBox(width: MediaQuery.of(context).size.width * 0.27),
-                    IconButton(
-                      icon: Icon(Icons.settings, color: Colors.black, size: 35),
-                      onPressed: (){
-                        Navigator.of(context).pushNamed('/settings')
-                        .then((value){
-                          setState(() {
-                          });
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ],
+            height: 270,
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                )
             ),
-          ),
-        )
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+              child:Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget> [
+                  SizedBox(height: 35),
+                  _textField(
+                      label: 'Start',
+                      hint: 'Choose starting point',
+                      prefixIcon: Icon(Icons.looks_one),
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.my_location),
+                        onPressed: () {
+                          startAddressController.text = _currentAddress;
+                          _startAddress = _currentAddress;
+                        },
+                      ),
+                      controller: startAddressController,
+                      width: MediaQuery.of(context).size.width,
+                      locationCallback: (String value) {
+                        setState(() {
+                          _startAddress = value;
+
+                        });
+                      }),
+                  SizedBox(height: 10),
+                  _textField(
+                      label: 'Destination',
+                      hint: 'Choose destination',
+                      prefixIcon: Icon(Icons.looks_two),
+                      controller: destinationAddressController,
+                      width: MediaQuery.of(context).size.width,
+                      locationCallback: (String value) {
+                        setState(() {
+                          _destinationAddress = value;
+                        });
+                      }),
+                  SizedBox(height: 50,),
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      FloatingActionButton(
+                        onPressed: ()
+                        {
+                          if(_startAddress != '' &&
+                              _destinationAddress != '' &&
+                              (_previousStartAddress != _startAddress ||
+                                  _previousDestinationAddress != _destinationAddress)) {
+                            setState(() {
+                              if (markers.isNotEmpty) markers.clear();
+                              if (polylines.isNotEmpty)
+                                polylines.clear();
+                              if (polylineCoordinates.isNotEmpty)
+                                polylineCoordinates.clear();
+                              _placeDistance = null;
+                            });
+                            for(var i = 0; i < driverList.length; i++) {
+                              Marker driverMarker = new Marker(
+                                  onTap: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) =>
+                                            DriverDialog(
+                                                name: driverList[i].name,
+                                                surname: driverList[i].surname,
+                                                phone: driver.phone,
+                                                carModel: driver.carModel,
+                                                plateNumber: driver.plateNumber)
+                                    );
+                                  },
+                                  markerId: MarkerId('id$i'),
+                                  position: LatLng(
+                                    driverList[i].Lat,
+                                    28.7,
+                                  ),
+                                  infoWindow: InfoWindow(
+                                    title: 'BMW',
+                                    snippet: '2 places available',
+                                  ),
+                                  icon: carIcon
+                              );
+                              markers.add(driverMarker);
+                            }
+                            _calculateDistance();
+                          }
+                          _previousStartAddress = _startAddress;
+                          _previousDestinationAddress = _destinationAddress;
+                          Navigator.of(context).pop();
+                        },
+                        elevation: 3,
+                        backgroundColor: Colors.black,
+                        child: Icon(Icons.arrow_downward_rounded),
+                      ),
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.27),
+                      IconButton(
+                        icon: Icon(Icons.settings, color: Colors.black, size: 35),
+                        onPressed: (){
+                          Navigator.of(context).pushNamed('/settings')
+                              .then((value){
+                            setState(() {
+                            });
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          )
       );
 
     }
@@ -610,6 +684,5 @@ class _MapViewState extends State<MapView> {
     );
 
   }
+
 }
-
-

@@ -36,7 +36,6 @@ Future<User> fetchUser(String id) async {
   final response = await http.get('https://hitchhikeapi.herokuapp.com/api/users/' + id);
 
   if (response.statusCode == 200) {
-    print(response.body);
     return User.fromJson(jsonDecode(response.body));
   } else {
     // If the server did not return a 200 OK response,
