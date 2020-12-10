@@ -7,6 +7,10 @@ class User {
     final String surname;
     final String phone;
     final String car_id;
+    final String carModel = 'Nissan';
+    final String plateNumber = 'BOS 496';
+    double lat = 46.0;
+    double lng = 28.0;
 
   User({this.id,  this.name, this.surname, this.phone, this.car_id});
 

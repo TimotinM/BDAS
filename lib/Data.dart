@@ -7,9 +7,11 @@ Future<String> id;
 String id_s;
 Future<User> user;
 
+double radius = 300;
+
 bool isLoggedIn = false;
 bool loading = false;
-bool isDriver = true;
+bool isDriver = false;
 bool dark = false;
 bool isSatelit = false;
 bool isLive = false;

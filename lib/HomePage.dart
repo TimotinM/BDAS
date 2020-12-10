@@ -24,7 +24,7 @@ class MapView extends StatefulWidget {
 }
 
 class _MapViewState extends State<MapView> {
-  var driverList = List<Driver>();
+  var driverList = List<User>();
   CameraPosition _initialLocation = CameraPosition(target: LatLng(0.0, 0.0));
   GoogleMapController mapController;
 
@@ -154,6 +154,7 @@ class _MapViewState extends State<MapView> {
           ),
         );
       });
+      _precedentPosition = position;
       await _getAddress();
     }).catchError((e) {
       print(e);
@@ -191,7 +192,7 @@ class _MapViewState extends State<MapView> {
           CameraUpdate.newCameraPosition(
             CameraPosition(
               target: LatLng(position.latitude, position.longitude),
-              zoom: 15.0,
+              zoom: 16.0,
               tilt: 45,
               bearing: bearing( _precedentPosition ,position)
             ),
@@ -364,11 +365,22 @@ class _MapViewState extends State<MapView> {
           _placeDistance = totalDistance.toStringAsFixed(2);
           print('DISTANCE: $_placeDistance km');
         });
-
+        if(data.isDriver) {
           data.id.then((i) {
             sendDriverRoute(i, jsonEncode(polylineCoordinates));
           });
-
+        } else {
+          Future<List<dynamic>> drivers = getDrivers(startCoordinates.latitude, startCoordinates.longitude, destinationCoordinates.latitude, destinationCoordinates.longitude, data.radius);
+          drivers.then((d) {
+            for(var i = 0; i < d.length; i++){
+              Future<User> user = fetchUser(d[i].toString());
+              user.then((u) {
+                driverList.add(u);
+              });
+            }
+          });
+          print(driverList[0].name);
+        }
         return true;
       }
     } catch (e) {
@@ -442,11 +454,14 @@ class _MapViewState extends State<MapView> {
       await showDialog<String>(
         context: context,
         builder: (BuildContext context) => new AlertDialog(
-          title: new Text("Choose the type of user!"),
-          actions: <Widget>[
+          title: new Text("Choose the type of user"),
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
             new IconButton(
               icon: Icon(
-                     IconData(61806, fontFamily: 'MaterialIcons'),
+                     Icons.directions_car,
                      color: Colors.black,
                      size: 46,
               ),
@@ -460,7 +475,7 @@ class _MapViewState extends State<MapView> {
             SizedBox(width: 25),
             new IconButton(
               icon: Icon(
-                     IconData(61813, fontFamily: 'MaterialIcons'),
+                     Icons.directions_walk,
                         color: Colors.black,
                         size: 46,
                     ),
@@ -475,6 +490,7 @@ class _MapViewState extends State<MapView> {
 
           ],
         ),
+        )
       );
     });
     BitmapDescriptor.fromAssetImage(
@@ -482,8 +498,6 @@ class _MapViewState extends State<MapView> {
         'assets/carMarker.png').then((onValue) {
       carIcon = onValue;
     });
-    driverList.add(driver1);
-    driverList.add(driver2);
   }
 
 
@@ -530,7 +544,7 @@ class _MapViewState extends State<MapView> {
 
     if(data.isDriver) {
       fab = Icon(
-        IconData(61806, fontFamily: 'MaterialIcons'),
+        Icons.directions_car,
         color: color,
         size: 56,
       );
@@ -538,7 +552,7 @@ class _MapViewState extends State<MapView> {
 
     }else{
       fab = Icon(
-          IconData(61813, fontFamily: 'MaterialIcons'),
+          Icons.directions_walk,
           color: color,
           size: 56
       );
@@ -565,7 +579,7 @@ class _MapViewState extends State<MapView> {
                   mapType: mapType,
                   compassEnabled: true,
                   zoomGesturesEnabled: true,
-                  zoomControlsEnabled: false,
+                  zoomControlsEnabled: true,
                   onMapCreated: (GoogleMapController controller) {
                     mapController = controller;
                     isMapCreated = true;
@@ -751,7 +765,9 @@ class _MapViewState extends State<MapView> {
                                 polylineCoordinates.clear();
                               _placeDistance = null;
                             });
+                            _calculateDistance();
                             for(var i = 0; i < driverList.length; i++) {
+                              print(driverList[i].name);
                               Marker driverMarker = new Marker(
                                   onTap: () {
                                     showDialog(
@@ -760,25 +776,23 @@ class _MapViewState extends State<MapView> {
                                             DriverDialog(
                                                 name: driverList[i].name,
                                                 surname: driverList[i].surname,
-                                                phone: driver.phone,
-                                                carModel: driver.carModel,
+                                                phone: driverList[i].phone,
+                                                carModel: driverList[i].carModel,
                                                 plateNumber: driver.plateNumber)
                                     );
                                   },
                                   markerId: MarkerId('id$i'),
                                   position: LatLng(
-                                    driverList[i].Lat,
-                                    28.7,
-                                  ),
-                                  infoWindow: InfoWindow(
-                                    title: 'BMW',
-                                    snippet: '2 places available',
+                                    28.2,
+                                    46.2,
                                   ),
                                   icon: carIcon
                               );
-                              markers.add(driverMarker);
+                              setState(() {
+                                markers.add(driverMarker);
+                              });
+
                             }
-                            _calculateDistance();
                           }
                           _previousStartAddress = _startAddress;
                           _previousDestinationAddress = _destinationAddress;
