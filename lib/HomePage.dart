@@ -33,6 +33,7 @@ class _MapViewState extends State<MapView> {
   final Geolocator _geolocator = Geolocator();
 
   Position _currentPosition;
+  Position _precedentPosition;
   String _currentAddress;
 
   final startAddressController = TextEditingController();
@@ -144,7 +145,7 @@ class _MapViewState extends State<MapView> {
           CameraUpdate.newCameraPosition(
             CameraPosition(
               target: LatLng(position.latitude, position.longitude),
-              zoom: 18.0,
+              zoom: 15.0,
             ),
           ),
         );
@@ -153,6 +154,43 @@ class _MapViewState extends State<MapView> {
     }).catchError((e) {
       print(e);
     });
+  }
+
+  _getCurrentLocationLive() async {
+    await _geolocator
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
+        .then((Position position) async {
+      setState(() {
+        _currentPosition = position;
+        print('CURRENT POS: $_currentPosition');
+        mapController.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: LatLng(position.latitude, position.longitude),
+              zoom: 15.0,
+            ),
+          ),
+        );
+      });
+      await _getAddressLive();
+    }).catchError((e) {
+      print(e);
+    });
+  }
+
+  _getAddressLive() async {
+    try {
+      List<Placemark> p = await _geolocator.placemarkFromCoordinates(
+          _currentPosition.latitude, _currentPosition.longitude);
+
+      Placemark place = p[0];
+        _currentAddress =
+        "${place.name}, ${place.locality}, ${place.postalCode}, ${place.country}";
+        startAddressController.text = _currentAddress;
+        _startAddress = _currentAddress;
+    } catch (e) {
+      print(e);
+    }
   }
 
   // Method for retrieving the address
@@ -421,6 +459,12 @@ class _MapViewState extends State<MapView> {
 
   @override
   Widget build(BuildContext context) {
+
+    Future.delayed(const Duration(seconds: 3), () {
+      _getCurrentLocationLive();
+    });
+
+
     if(isMapCreated)
       changeMapMode();
 
@@ -508,7 +552,7 @@ class _MapViewState extends State<MapView> {
                                       _currentPosition.latitude,
                                       _currentPosition.longitude,
                                     ),
-                                    zoom: 18.0,
+                                    zoom: 15.0,
                                   ),
                                 ),
                               );
