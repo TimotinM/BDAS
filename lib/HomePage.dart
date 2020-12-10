@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'Driver.dart';
+import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -48,12 +49,14 @@ class _MapViewState extends State<MapView> {
   Color notColor = Colors.white;
 
   Icon fab;
+  Icon live;
 
   Icon fabMap = Icon(
     Icons.lightbulb,
     color: Colors.black,
     size: 56,
   );
+
 
   Future<bool> _onWillPop() {
     return showDialog(
@@ -156,6 +159,26 @@ class _MapViewState extends State<MapView> {
     });
   }
 
+  // double bearing(Position sPosition, Position ePosition){
+  //   double startLat = math.radians(sPosition.longitude);
+  //   double startLong = math.radians(-70.450696);
+  //   double endLat = math.radians(43.682194);
+  //   double endLong = math.radians(-70.450769)l
+  //
+  //   dLong = endLong - startLong
+  //
+  //   dPhi = math.log(math.tan(endLat/2.0+math.pi/4.0)/math.tan(startLat/2.0+math.pi/4.0))
+  //   if abs(dLong) > math.pi:
+  //   if dLong > 0.0:
+  //   dLong = -(2.0 * math.pi - dLong)
+  //   else:
+  //   dLong = (2.0 * math.pi + dLong)
+  //
+  //   bearing = (math.degrees(math.atan2(dLong, dPhi)) + 360.0) % 360.0;
+  //
+  //   print(bearing)
+  // }
+
   _getCurrentLocationLive() async {
     await _geolocator
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
@@ -168,6 +191,7 @@ class _MapViewState extends State<MapView> {
             CameraPosition(
               target: LatLng(position.latitude, position.longitude),
               zoom: 15.0,
+              tilt: 45,
             ),
           ),
         );
@@ -378,9 +402,9 @@ class _MapViewState extends State<MapView> {
     PolylineId id = PolylineId('poly');
     Polyline polyline = Polyline(
       polylineId: id,
-      color: Colors.red,
+      color: Colors.redAccent,
       points: polylineCoordinates,
-      width: 3,
+      width: 5,
     );
     polylines[id] = polyline;
   }
@@ -459,15 +483,6 @@ class _MapViewState extends State<MapView> {
 
   @override
   Widget build(BuildContext context) {
-
-    Future.delayed(const Duration(seconds: 3), () {
-      _getCurrentLocationLive();
-    });
-
-
-    if(isMapCreated)
-      changeMapMode();
-
     if(data.dark){
       color = Colors.white;
       notColor = Colors.black;
@@ -475,6 +490,31 @@ class _MapViewState extends State<MapView> {
       color = Colors.black;
       notColor = Colors.white;
     }
+
+    if(data.isLive)
+      Future.delayed(const Duration(seconds: 3), () {
+        _getCurrentLocationLive();
+      });
+
+    if(data.isLive) {
+      setState(() {
+      live = Icon(
+          Icons.near_me_outlined,
+          color: notColor,
+       );
+      });
+    }else{
+      setState(() {
+       live = Icon(
+           Icons.near_me_disabled_outlined,
+           color: notColor,
+       );
+      });
+    }
+
+    if(isMapCreated)
+      changeMapMode();
+
 
     if(data.isSatelit){
       mapType = MapType.hybrid;
@@ -517,6 +557,7 @@ class _MapViewState extends State<MapView> {
                   myLocationEnabled: true,
                   myLocationButtonEnabled: false,
                   mapType: mapType,
+                  compassEnabled: true,
                   zoomGesturesEnabled: true,
                   zoomControlsEnabled: false,
                   onMapCreated: (GoogleMapController controller) {
@@ -542,7 +583,7 @@ class _MapViewState extends State<MapView> {
                             child: SizedBox(
                               width: 56,
                               height: 56,
-                              child: Icon(Icons.my_location, color: notColor),
+                              child: Icon(Icons.my_location_outlined, color: notColor),
                             ),
                             onTap: () {
                               mapController.animateCamera(
@@ -556,6 +597,35 @@ class _MapViewState extends State<MapView> {
                                   ),
                                 ),
                               );
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                SafeArea(
+                  child: Align(
+                    alignment: Alignment.bottomRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 10.0, bottom: 80.0),
+                      child: ClipOval(
+                        child: Material(
+                          color: color, // button color
+                          child: InkWell(
+                            splashColor: Colors.grey[900], // inkwell color
+                            child: SizedBox(
+                              width: 56,
+                              height: 56,
+                              child: live,
+                            ),
+                            onTap: () {
+                             setState(() {
+                               data.isLive = !data.isLive;
+                             });
+                             if(data.isLive)
+                              _getCurrentLocationLive();
                             },
                           ),
                         ),
