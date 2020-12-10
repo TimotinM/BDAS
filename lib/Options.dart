@@ -90,7 +90,7 @@ class _Options extends State<Options>{
               _startRadiusController.text + ' m',
               style: TextStyle(color: Colors.grey),
           ),
-          leading: Icon(IconData(61474, fontFamily: 'MaterialIcons')),
+          leading: Icon(Icons.wifi_tethering_outlined),
           onTap: () {
             _showDialog(_startRadiusController, "Start Radius");
           }
@@ -106,7 +106,7 @@ class _Options extends State<Options>{
             _endRadiusController.text + ' m',
             style: TextStyle(color: Colors.grey),
           ),
-          leading: Icon(IconData(61474, fontFamily: 'MaterialIcons')),
+          leading: Icon(Icons.wifi_tethering_outlined),
 
           onTap: (){
             _showDialog(_endRadiusController, "End Radius");
@@ -115,7 +115,7 @@ class _Options extends State<Options>{
       );
 
       final editProfile = Container(
-        height: 70,
+        height: 60,
         color: Colors.white,
         child: ListTile(
           title: Text('Edit Profile'),
@@ -123,11 +123,11 @@ class _Options extends State<Options>{
           onTap: () {
             Navigator.of(context).pushNamed('/editProfile');
           },
-          leading: Icon(IconData(57360, fontFamily: 'MaterialIcons')),
+          leading: Icon(Icons.person_outline),
         ),
       );
       final changePassword = Container(
-        height: 70,
+        height: 60,
         color: Colors.white,
         child: ListTile(
           title: Text('Change Password'),
@@ -135,61 +135,65 @@ class _Options extends State<Options>{
           onTap: () {
             Navigator.of(context).pushNamed('/changePassword');
           },
-          leading: Icon(IconData(58625, fontFamily: 'MaterialIcons')),
+          leading: Icon(Icons.vpn_key_outlined),
         ),
       );
 
-      final darkMap = Container (
+      final darkMap = Container(
         height: 50,
         color: Colors.white,
-        child: Row(
-          children: <Widget>[
-            SizedBox(width: 16),
-            Icon(Icons.lightbulb_outline),
-            SizedBox(width: 20),
-            Text(
-                'Map dark mode',
-                 style: TextStyle(fontSize: 17),
-            ),
-            SizedBox(width: MediaQuery.of(context).size.width*0.35),
-            CupertinoSwitch(
-                activeColor: Colors.black,
-                value: data.dark,
-                onChanged: (value){
-                  setState(() {
-                    data.dark = !data.dark;
-                  });
-                }
-            )
-          ],
+        child: ListTile(
+          title: Text('Map dark mode'),
+          trailing:  CupertinoSwitch(
+              activeColor: Colors.black,
+              value: data.dark,
+              onChanged: (value){
+                setState(() {
+                  data.dark = !data.dark;
+                });
+              }
+          ),
+          leading: Icon(Icons.lightbulb_outline),
         ),
       );
 
-      final driver = Container (
+      final mapType = Container(
         height: 50,
         color: Colors.white,
-        child: Row(
-          children: <Widget>[
-            SizedBox(width: 16),
-            Icon(Icons.drive_eta_outlined),
-            SizedBox(width: 20),
-            Text(
-              " I'm a driver       ",
-              style: TextStyle(fontSize: 17),
-            ),
-            SizedBox(width: MediaQuery.of(context).size.width*0.35),
-            CupertinoSwitch(
+        child: ListTile(
+            title: Text("Map type satellite"),
+            trailing:  CupertinoSwitch(
                 activeColor: Colors.black,
-                value: data.isDriver,
+                value: data.isSatelit,
                 onChanged: (value){
                   setState(() {
-                    data.isDriver = !data.isDriver;
+                    data.isSatelit = !data.isSatelit;
                   });
                 }
-            )
-          ],
+            ),
+            leading: Icon(Icons.satellite_outlined)
         ),
       );
+
+
+      final driver = Container(
+        height: 50,
+        color: Colors.white,
+        child: ListTile(
+          title: Text("I'm a driver"),
+          trailing:  CupertinoSwitch(
+              activeColor: Colors.black,
+              value: data.isDriver,
+              onChanged: (value){
+                setState(() {
+                  data.isDriver = !data.isDriver;
+                });
+              }
+          ),
+          leading: Icon(Icons.drive_eta_outlined)
+        ),
+      );
+
 
       return Scaffold(
         //backgroundColor: Colors.grey,
@@ -248,6 +252,8 @@ class _Options extends State<Options>{
                   endRadius,
                   SizedBox(height: 20),
                   darkMap,
+                  SizedBox(height: 2),
+                  mapType,
                   SizedBox(height: 2),
                   driver
                 ],

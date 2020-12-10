@@ -364,7 +364,7 @@ class _MapViewState extends State<MapView> {
   }
 
   BitmapDescriptor carIcon;
-
+  MapType mapType;
   @override
   void initState() {
     super.initState();
@@ -410,7 +410,7 @@ class _MapViewState extends State<MapView> {
       );
     });
     BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(size: Size(100, 100)),
+        ImageConfiguration(size: Size(50, 50)),
         'assets/carMarker.png').then((onValue) {
       carIcon = onValue;
     });
@@ -422,8 +422,8 @@ class _MapViewState extends State<MapView> {
   @override
   Widget build(BuildContext context) {
     if(isMapCreated)
-
       changeMapMode();
+
     if(data.dark){
       color = Colors.white;
       notColor = Colors.black;
@@ -432,12 +432,20 @@ class _MapViewState extends State<MapView> {
       notColor = Colors.white;
     }
 
+    if(data.isSatelit){
+      mapType = MapType.hybrid;
+    }else{
+      mapType = MapType.normal;
+    }
+
     if(data.isDriver) {
       fab = Icon(
         IconData(61806, fontFamily: 'MaterialIcons'),
         color: color,
         size: 56,
       );
+
+
     }else{
       fab = Icon(
           IconData(61813, fontFamily: 'MaterialIcons'),
@@ -464,7 +472,7 @@ class _MapViewState extends State<MapView> {
                   initialCameraPosition: _initialLocation,
                   myLocationEnabled: true,
                   myLocationButtonEnabled: false,
-                  mapType: MapType.normal,
+                  mapType: mapType,
                   zoomGesturesEnabled: true,
                   zoomControlsEnabled: false,
                   onMapCreated: (GoogleMapController controller) {
