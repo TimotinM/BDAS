@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'Driver.dart';
 import 'dart:math';
+import 'package:vector_math/vector_math.dart' as math;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -159,25 +160,25 @@ class _MapViewState extends State<MapView> {
     });
   }
 
-  // double bearing(Position sPosition, Position ePosition){
-  //   double startLat = math.radians(sPosition.longitude);
-  //   double startLong = math.radians(-70.450696);
-  //   double endLat = math.radians(43.682194);
-  //   double endLong = math.radians(-70.450769)l
-  //
-  //   dLong = endLong - startLong
-  //
-  //   dPhi = math.log(math.tan(endLat/2.0+math.pi/4.0)/math.tan(startLat/2.0+math.pi/4.0))
-  //   if abs(dLong) > math.pi:
-  //   if dLong > 0.0:
-  //   dLong = -(2.0 * math.pi - dLong)
-  //   else:
-  //   dLong = (2.0 * math.pi + dLong)
-  //
-  //   bearing = (math.degrees(math.atan2(dLong, dPhi)) + 360.0) % 360.0;
-  //
-  //   print(bearing)
-  // }
+  double bearing(Position sPosition, Position ePosition){
+    double startLat = math.radians(sPosition.latitude);
+    double startLong = math.radians(sPosition.longitude);
+    double endLat = math.radians(ePosition.latitude);
+    double endLong = math.radians(ePosition.longitude);
+    double pi = 3.1415926535897932;
+    double dLong = endLong - startLong;
+
+    double dPhi = log(tan(endLat/2.0+pi/4.0)/tan(startLat/2.0+pi/4.0));
+    if (dLong.abs() > pi)
+     if (dLong > 0.0)
+     dLong = -(2.0 * pi - dLong);
+    else
+     dLong = (2.0 * pi + dLong);
+
+    double bearing = (math.degrees(atan2(dLong, dPhi)) + 360.0) % 360.0;
+
+    return bearing;
+  }
 
   _getCurrentLocationLive() async {
     await _geolocator
@@ -192,10 +193,15 @@ class _MapViewState extends State<MapView> {
               target: LatLng(position.latitude, position.longitude),
               zoom: 15.0,
               tilt: 45,
+              bearing: bearing( _precedentPosition ,position)
             ),
           ),
         );
       });
+      setState(() {
+        _precedentPosition = position;
+      });
+
       await _getAddressLive();
     }).catchError((e) {
       print(e);
@@ -358,11 +364,11 @@ class _MapViewState extends State<MapView> {
           _placeDistance = totalDistance.toStringAsFixed(2);
           print('DISTANCE: $_placeDistance km');
         });
-        if(data.isDriver){
+
           data.id.then((i) {
             sendDriverRoute(i, jsonEncode(polylineCoordinates));
           });
-        }
+
         return true;
       }
     } catch (e) {
