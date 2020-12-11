@@ -29,7 +29,7 @@ class _MapViewState extends State<MapView> {
   GoogleMapController mapController;
 
   bool isMapCreated = false;
- var driver = new Driver();
+  var driver = new Driver();
   var driver1 = new Driver(name:'Vasile', surname:'Kop', Lat:46.2);
   var driver2 = new Driver(name:'Jora', surname:'Jug', Lat:46.4);
   final Geolocator _geolocator = Geolocator();
@@ -37,6 +37,8 @@ class _MapViewState extends State<MapView> {
   Position _currentPosition;
   Position _precedentPosition;
   String _currentAddress;
+  Position destinationCoordinates;
+  bool tap = false;
 
   final startAddressController = TextEditingController();
   final destinationAddressController = TextEditingController();
@@ -172,10 +174,10 @@ class _MapViewState extends State<MapView> {
 
     double dPhi = log(tan(endLat/2.0+pi/4.0)/tan(startLat/2.0+pi/4.0));
     if (dLong.abs() > pi)
-     if (dLong > 0.0)
-     dLong = -(2.0 * pi - dLong);
-    else
-     dLong = (2.0 * pi + dLong);
+      if (dLong > 0.0)
+        dLong = -(2.0 * pi - dLong);
+      else
+        dLong = (2.0 * pi + dLong);
 
     double bearing = (math.degrees(atan2(dLong, dPhi)) + 360.0) % 360.0;
 
@@ -192,10 +194,10 @@ class _MapViewState extends State<MapView> {
         mapController.animateCamera(
           CameraUpdate.newCameraPosition(
             CameraPosition(
-              target: LatLng(position.latitude, position.longitude),
-              zoom: 16.0,
-              tilt: 45,
-              bearing: bearing( _precedentPosition ,position)
+                target: LatLng(position.latitude, position.longitude),
+                zoom: 16.0,
+                tilt: 45,
+                bearing: bearing( _precedentPosition ,position)
             ),
           ),
         );
@@ -216,10 +218,10 @@ class _MapViewState extends State<MapView> {
           _currentPosition.latitude, _currentPosition.longitude);
 
       Placemark place = p[0];
-        _currentAddress =
-        "${place.name}, ${place.locality}, ${place.postalCode}, ${place.country}";
-        startAddressController.text = _currentAddress;
-        _startAddress = _currentAddress;
+      _currentAddress =
+      "${place.name}, ${place.locality}, ${place.postalCode}, ${place.country}";
+      startAddressController.text = _currentAddress;
+      _startAddress = _currentAddress;
     } catch (e) {
       print(e);
     }
@@ -244,40 +246,24 @@ class _MapViewState extends State<MapView> {
     }
   }
 
-  _handleTap(LatLng tappedPoint) async {
-
+  _getEndAddress(LatLng tapped) async {
     try {
       List<Placemark> p = await _geolocator.placemarkFromCoordinates(
-          tappedPoint.latitude, tappedPoint.longitude);
+          tapped.latitude, tapped.longitude);
 
       Placemark place = p[0];
 
       setState(() {
-        _currentAddress=
+        String currentAddress =
         "${place.name}, ${place.locality}, ${place.postalCode}, ${place.country}";
-        destinationAddressController.text = _currentAddress;
-        _destinationAddress = _currentAddress;
+        destinationAddressController.text = currentAddress;
       });
-
-      if(_startAddress != '' &&
-          _destinationAddress != ''){
-        setState(() {
-          if (markers.isNotEmpty) markers.clear();
-          if (polylines.isNotEmpty)
-            polylines.clear();
-          if (polylineCoordinates.isNotEmpty)
-            polylineCoordinates.clear();
-          _placeDistance = null;
-        });
-        _calculateDistance();
-        _previousStartAddress = _startAddress;
-        _previousDestinationAddress = _destinationAddress;
-      }
     } catch (e) {
       print(e);
     }
-
   }
+
+
 
   // Method for calculating the distance between two places
   Future<bool> _calculateDistance() async {
@@ -297,8 +283,9 @@ class _MapViewState extends State<MapView> {
             latitude: _currentPosition.latitude,
             longitude: _currentPosition.longitude)
             : startPlacemark[0].position;
-        Position destinationCoordinates = destinationPlacemark[0].position;
-
+        if(!tap)
+          destinationCoordinates = destinationPlacemark[0].position;
+        tap = false;
         // Start Location Marker
         Marker startMarker = Marker(
           markerId: MarkerId('A'),
@@ -506,45 +493,45 @@ class _MapViewState extends State<MapView> {
     data.loading = false;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await showDialog<String>(
-        context: context,
-        builder: (BuildContext context) => new AlertDialog(
-          title: new Text("Choose the type of user"),
-          content: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-            new IconButton(
-              icon: Icon(
-                     Icons.directions_car,
-                     color: Colors.black,
-                     size: 46,
-              ),
-              onPressed: () {
-                setState(() {
-                  data.isDriver = true;
-                });
-                Navigator.of(context).pop();
-              },
-            ),
-            SizedBox(width: 25),
-            new IconButton(
-              icon: Icon(
-                     Icons.directions_walk,
-                        color: Colors.black,
-                        size: 46,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        data.isDriver = false;
-                      });
-                      Navigator.of(context).pop();
-                    },
-            ),
-            SizedBox(width: 12)
+          context: context,
+          builder: (BuildContext context) => new AlertDialog(
+            title: new Text("Choose the type of user"),
+            content: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                new IconButton(
+                  icon: Icon(
+                    Icons.directions_car,
+                    color: Colors.black,
+                    size: 46,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      data.isDriver = true;
+                    });
+                    Navigator.of(context).pop();
+                  },
+                ),
+                SizedBox(width: 25),
+                new IconButton(
+                  icon: Icon(
+                    Icons.directions_walk,
+                    color: Colors.black,
+                    size: 46,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      data.isDriver = false;
+                    });
+                    Navigator.of(context).pop();
+                  },
+                ),
+                SizedBox(width: 12)
 
-          ],
-        ),
-        )
+              ],
+            ),
+          )
       );
     });
     BitmapDescriptor.fromAssetImage(
@@ -572,17 +559,17 @@ class _MapViewState extends State<MapView> {
 
     if(data.isLive) {
       setState(() {
-      live = Icon(
+        live = Icon(
           Icons.near_me_outlined,
           color: notColor,
-       );
+        );
       });
     }else{
       setState(() {
-       live = Icon(
-           Icons.near_me_disabled_outlined,
-           color: notColor,
-       );
+        live = Icon(
+          Icons.near_me_disabled_outlined,
+          color: notColor,
+        );
       });
     }
 
@@ -639,7 +626,19 @@ class _MapViewState extends State<MapView> {
               children: <Widget>[
                 // Map View
                 GoogleMap(
-                  onTap: data.setMarker? _handleTap : null,
+                  onTap: data.setMarker? (tapped) {
+                    tap = true;
+                    Position a = Position(latitude: tapped.latitude, longitude: tapped.longitude);
+                    destinationCoordinates = a;
+                    if (markers.isNotEmpty) markers.clear();
+                    if (polylines.isNotEmpty)
+                      polylines.clear();
+                    if (polylineCoordinates.isNotEmpty)
+                      polylineCoordinates.clear();
+                    _placeDistance = null;
+                    _calculateDistance();
+                    _getEndAddress(tapped);
+                  } : null,
                   polylines: Set<Polyline>.of(polylines.values),
                   markers: markers != null ? Set<Marker>.from(markers) : null,
                   initialCameraPosition: _initialLocation,
@@ -710,11 +709,11 @@ class _MapViewState extends State<MapView> {
                               child: live,
                             ),
                             onTap: () {
-                             setState(() {
-                               data.isLive = !data.isLive;
-                             });
-                             if(data.isLive)
-                              _getCurrentLocationLive();
+                              setState(() {
+                                data.isLive = !data.isLive;
+                              });
+                              if(data.isLive)
+                                _getCurrentLocationLive();
                             },
                           ),
                         ),
@@ -758,11 +757,11 @@ class _MapViewState extends State<MapView> {
                       child: ClipOval(
                         child: Material(
                           color: Colors.transparent, // button color
-                              child: SizedBox(
-                                width: 56,
-                                height: 56,
-                                child: fab,
-                              ),
+                          child: SizedBox(
+                            width: 56,
+                            height: 56,
+                            child: fab,
+                          ),
                         ),
                       ),
                     ),
