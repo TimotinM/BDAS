@@ -31,8 +31,6 @@ class _MapViewState extends State<MapView> {
 
   bool isMapCreated = false;
   var driver = new Driver();
-  var driver1 = new Driver(name:'Vasile', surname:'Kop', Lat:46.2);
-  var driver2 = new Driver(name:'Jora', surname:'Jug', Lat:46.4);
   final Geolocator _geolocator = Geolocator();
 
   Position _currentPosition;
@@ -418,6 +416,7 @@ class _MapViewState extends State<MapView> {
                   ),
                   icon: carIcon
               );
+
               setState(() {
                 markers.add(driverMarker);
               });
@@ -547,6 +546,7 @@ class _MapViewState extends State<MapView> {
       ..addListener(_onScroll);
   }
   int prevPage;
+
   void _onScroll() {
     if (_pageController.page.toInt() != prevPage) {
       prevPage = _pageController.page.toInt();
@@ -556,6 +556,7 @@ class _MapViewState extends State<MapView> {
 
   @override
   Widget build(BuildContext context) {
+
     if(data.dark){
       color = Colors.white;
       notColor = Colors.black;
@@ -650,6 +651,9 @@ class _MapViewState extends State<MapView> {
                     _placeDistance = null;
                     _getEndAddress(tapped);
                     _calculateDistance();
+                    setState(() {
+                      data.setMarker = false;
+                    });
                   } : null,
                   polylines: Set<Polyline>.of(polylines.values),
                   markers: markers != null ? Set<Marker>.from(markers) : null,
