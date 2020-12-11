@@ -9,6 +9,7 @@ Future<User> user;
 
 double radius = 300;
 
+bool setMarker = false;
 bool isLoggedIn = false;
 bool loading = false;
 bool isDriver = false;

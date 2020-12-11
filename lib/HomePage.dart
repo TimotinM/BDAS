@@ -51,6 +51,7 @@ class _MapViewState extends State<MapView> {
 
   Icon fab;
   Icon live;
+  Icon endAdress;
 
   Icon fabMap = Icon(
     Icons.lightbulb,
@@ -243,6 +244,41 @@ class _MapViewState extends State<MapView> {
     }
   }
 
+  _handleTap(LatLng tappedPoint) async {
+
+    try {
+      List<Placemark> p = await _geolocator.placemarkFromCoordinates(
+          tappedPoint.latitude, tappedPoint.longitude);
+
+      Placemark place = p[0];
+
+      setState(() {
+        _currentAddress=
+        "${place.name}, ${place.locality}, ${place.postalCode}, ${place.country}";
+        destinationAddressController.text = _currentAddress;
+        _destinationAddress = _currentAddress;
+      });
+
+      if(_startAddress != '' &&
+          _destinationAddress != ''){
+        setState(() {
+          if (markers.isNotEmpty) markers.clear();
+          if (polylines.isNotEmpty)
+            polylines.clear();
+          if (polylineCoordinates.isNotEmpty)
+            polylineCoordinates.clear();
+          _placeDistance = null;
+        });
+        _calculateDistance();
+        _previousStartAddress = _startAddress;
+        _previousDestinationAddress = _destinationAddress;
+      }
+    } catch (e) {
+      print(e);
+    }
+
+  }
+
   // Method for calculating the distance between two places
   Future<bool> _calculateDistance() async {
     try {
@@ -265,21 +301,17 @@ class _MapViewState extends State<MapView> {
 
         // Start Location Marker
         Marker startMarker = Marker(
-          markerId: MarkerId('$startCoordinates'),
+          markerId: MarkerId('A'),
           position: LatLng(
             startCoordinates.latitude,
             startCoordinates.longitude,
-          ),
-          infoWindow: InfoWindow(
-            title: 'Start',
-            snippet: _startAddress,
           ),
           icon: BitmapDescriptor.defaultMarker,
         );
 
 
         Marker destinationMarker = Marker(
-          markerId: MarkerId('$destinationCoordinates'),
+          markerId: MarkerId('B'),
           position: LatLng(
             destinationCoordinates.latitude,
             destinationCoordinates.longitude,
@@ -554,6 +586,22 @@ class _MapViewState extends State<MapView> {
       });
     }
 
+    if(data.setMarker) {
+      setState(() {
+        endAdress = Icon(
+          Icons.add_location_rounded,
+          color: notColor,
+        );
+      });
+    }else{
+      setState(() {
+        endAdress = Icon(
+          Icons.add_location_outlined,
+          color: notColor,
+        );
+      });
+    }
+
     if(isMapCreated)
       changeMapMode();
 
@@ -570,8 +618,6 @@ class _MapViewState extends State<MapView> {
         color: color,
         size: 56,
       );
-
-
     }else{
       fab = Icon(
           Icons.directions_walk,
@@ -593,6 +639,7 @@ class _MapViewState extends State<MapView> {
               children: <Widget>[
                 // Map View
                 GoogleMap(
+                  onTap: data.setMarker? _handleTap : null,
                   polylines: Set<Polyline>.of(polylines.values),
                   markers: markers != null ? Set<Marker>.from(markers) : null,
                   initialCameraPosition: _initialLocation,
@@ -668,6 +715,33 @@ class _MapViewState extends State<MapView> {
                              });
                              if(data.isLive)
                               _getCurrentLocationLive();
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                SafeArea(
+                  child: Align(
+                    alignment: Alignment.bottomRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 10.0, bottom: 150.0),
+                      child: ClipOval(
+                        child: Material(
+                          color: color, // button color
+                          child: InkWell(
+                            splashColor: Colors.grey[900], // inkwell color
+                            child: SizedBox(
+                              width: 56,
+                              height: 56,
+                              child: endAdress,
+                            ),
+                            onTap: () {
+                              setState(() {
+                                data.setMarker = !data.setMarker;
+                              });
                             },
                           ),
                         ),
