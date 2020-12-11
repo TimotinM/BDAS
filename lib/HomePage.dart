@@ -377,9 +377,31 @@ class _MapViewState extends State<MapView> {
               user.then((u) {
                 driverList.add(u);
               });
+              Marker driverMarker = new Marker(
+                  onTap: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) =>
+                            DriverDialog(
+                                name: driverList[i].name,
+                                surname: driverList[i].surname,
+                                phone: driverList[i].phone,
+                                carModel: driverList[i].carModel,
+                                plateNumber: driver.plateNumber)
+                    );
+                  },
+                  markerId: MarkerId('$i'),
+                  position: LatLng(
+                    46.6,
+                    28.2 + i,
+                  ),
+                  icon: carIcon
+              );
+              setState(() {
+                markers.add(driverMarker);
+              });
             }
           });
-          print(driverList[0].name);
         }
         return true;
       }
@@ -766,33 +788,6 @@ class _MapViewState extends State<MapView> {
                               _placeDistance = null;
                             });
                             _calculateDistance();
-                            for(var i = 0; i < driverList.length; i++) {
-                              print(driverList[i].name);
-                              Marker driverMarker = new Marker(
-                                  onTap: () {
-                                    showDialog(
-                                        context: context,
-                                        builder: (context) =>
-                                            DriverDialog(
-                                                name: driverList[i].name,
-                                                surname: driverList[i].surname,
-                                                phone: driverList[i].phone,
-                                                carModel: driverList[i].carModel,
-                                                plateNumber: driver.plateNumber)
-                                    );
-                                  },
-                                  markerId: MarkerId('id$i'),
-                                  position: LatLng(
-                                    28.2,
-                                    46.2,
-                                  ),
-                                  icon: carIcon
-                              );
-                              setState(() {
-                                markers.add(driverMarker);
-                              });
-
-                            }
                           }
                           _previousStartAddress = _startAddress;
                           _previousDestinationAddress = _destinationAddress;
