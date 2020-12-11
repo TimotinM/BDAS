@@ -257,6 +257,7 @@ class _MapViewState extends State<MapView> {
         String currentAddress =
         "${place.name}, ${place.locality}, ${place.postalCode}, ${place.country}";
         destinationAddressController.text = currentAddress;
+        _destinationAddress = currentAddress;
       });
     } catch (e) {
       print(e);
@@ -636,8 +637,8 @@ class _MapViewState extends State<MapView> {
                     if (polylineCoordinates.isNotEmpty)
                       polylineCoordinates.clear();
                     _placeDistance = null;
-                    _calculateDistance();
                     _getEndAddress(tapped);
+                    _calculateDistance();
                   } : null,
                   polylines: Set<Polyline>.of(polylines.values),
                   markers: markers != null ? Set<Marker>.from(markers) : null,
