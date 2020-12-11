@@ -38,6 +38,8 @@ class _MapViewState extends State<MapView> {
   String _currentAddress;
   Position destinationCoordinates;
   bool tap = false;
+  bool showUser = false;
+  bool y = false;
 
   final startAddressController = TextEditingController();
   final destinationAddressController = TextEditingController();
@@ -418,6 +420,7 @@ class _MapViewState extends State<MapView> {
               );
 
               setState(() {
+                showUser = true;
                 markers.add(driverMarker);
               });
             }
@@ -564,6 +567,16 @@ class _MapViewState extends State<MapView> {
       color = Colors.black;
       notColor = Colors.white;
     }
+    if(showUser){
+      Future.delayed(const Duration(seconds: 1), () {
+        if(y)
+          showUser = false;
+        setState(() {
+
+        });
+        y = true;
+      });
+    }
 
     if(data.isLive)
       Future.delayed(const Duration(seconds: 3), () {
@@ -665,11 +678,10 @@ class _MapViewState extends State<MapView> {
                   zoomGesturesEnabled: true,
                   zoomControlsEnabled: true,
                   onMapCreated: (GoogleMapController controller) {
-                    mapController = controller;
-                    isMapCreated = true;
-                    changeMapMode();
                     setState(() {
-
+                      mapController = controller;
+                      isMapCreated = true;
+                      changeMapMode();
                     });
                   },
                 ),
@@ -1011,5 +1023,9 @@ class _MapViewState extends State<MapView> {
           ])),
     );
   }
-
+  void mapCreated(controller) {
+    setState(() {
+      mapController = controller;
+    });
+  }
 }
