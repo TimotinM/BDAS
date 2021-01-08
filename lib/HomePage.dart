@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 import 'Driver.dart';
 import 'dart:math';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:vector_math/vector_math.dart' as math;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -52,6 +55,7 @@ class _MapViewState extends State<MapView> {
   Color color = Colors.black;
   Color notColor = Colors.white;
 
+  Timer timer;
   Icon fab;
   Icon live;
   Icon endAdress;
@@ -86,11 +90,13 @@ class _MapViewState extends State<MapView> {
 
 
   Set<Marker> markers = {};
+  final channel = IOWebSocketChannel.connect('ws://hikesocket.herokuapp.com/'); // Muta unde se incepe route
 
 
   PolylinePoints polylinePoints;
   Map<PolylineId, Polyline> polylines = {};
   List<LatLng> polylineCoordinates = [];
+  List<LatLng> polylineCoordinatesTracker = [];
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -153,12 +159,11 @@ class _MapViewState extends State<MapView> {
           CameraUpdate.newCameraPosition(
             CameraPosition(
               target: LatLng(position.latitude, position.longitude),
-              zoom: 15.0,
+              zoom: 10.0,
             ),
           ),
         );
       });
-      _precedentPosition = position;
       await _getAddress();
     }).catchError((e) {
       print(e);
@@ -171,24 +176,23 @@ class _MapViewState extends State<MapView> {
     double endLat = math.radians(ePosition.latitude);
     double endLong = math.radians(ePosition.longitude);
     double pi = 3.1415926535897932;
-    double dLong = endLong - startLong;
 
+    double dLong = endLong - startLong;
     double dPhi = log(tan(endLat/2.0+pi/4.0)/tan(startLat/2.0+pi/4.0));
     if (dLong.abs() > pi)
       if (dLong > 0.0)
         dLong = -(2.0 * pi - dLong);
       else
         dLong = (2.0 * pi + dLong);
-
     double bearing = (math.degrees(atan2(dLong, dPhi)) + 360.0) % 360.0;
-
     return bearing;
   }
 
   _getCurrentLocationLive() async {
-    await _geolocator
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
-        .then((Position position) async {
+    await
+    _geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
+        .then((Position position)
+    async {
       setState(() {
         _currentPosition = position;
         print('CURRENT POS: $_currentPosition');
@@ -196,7 +200,7 @@ class _MapViewState extends State<MapView> {
           CameraUpdate.newCameraPosition(
             CameraPosition(
                 target: LatLng(position.latitude, position.longitude),
-                zoom: 16.0,
+                zoom: 17.0,
                 tilt: 45,
                 bearing: bearing( _precedentPosition ,position)
             ),
@@ -265,7 +269,27 @@ class _MapViewState extends State<MapView> {
     }
   }
 
-
+  Future<bool> _liveTracker() async {
+    try {
+      if(!data.isLive)
+        _getCurrentLocation();
+        await _createPolylinesTrackers(_currentPosition, destinationCoordinates);
+        _precedentPosition = _currentPosition;
+        if(data.isDriver) {
+          data.id.then((i) {
+            //sendDriverRoute(i, jsonEncode(polylineCoordinatesTracker));
+            channel.sink.add(jsonEncode(<String, dynamic>{
+                  'id': i,
+                  "points": polylineCoordinatesTracker,
+                }));
+          });
+        }
+        return true;
+    } catch (e) {
+      print(e);
+    }
+    return false;
+  }
 
   // Method for calculating the distance between two places
   Future<bool> _calculateDistance() async {
@@ -413,8 +437,8 @@ class _MapViewState extends State<MapView> {
                   },
                   markerId: MarkerId('$i'),
                   position: LatLng(
-                    46.6,
-                    28.2 + i,
+                    46.9842,
+                    28.7781
                   ),
                   icon: carIcon
               );
@@ -444,6 +468,22 @@ class _MapViewState extends State<MapView> {
         c((lat2 - lat1) * p) / 2 +
         c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
     return 12742 * asin(sqrt(a));
+  }
+
+  _createPolylinesTrackers(Position start, Position destination) async {
+    polylinePoints = PolylinePoints();
+    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+      Secret.API_KEY, // Google Maps API Key
+      PointLatLng(start.latitude, start.longitude),
+      PointLatLng(destination.latitude, destination.longitude),
+      travelMode: TravelMode.driving,
+    );
+
+    if (result.points.isNotEmpty) {
+      result.points.forEach((PointLatLng point) {
+        polylineCoordinatesTracker.add(LatLng(point.latitude, point.longitude));
+      });
+    }
   }
 
   // Create the polylines for showing the route between two places
@@ -556,9 +596,22 @@ class _MapViewState extends State<MapView> {
     }
   }
 
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
+
+  if(_destinationAddress != '' && data.isDriver) {
+    Future.delayed(const Duration(seconds: 3), () {
+      polylineCoordinatesTracker.clear();
+      _liveTracker();
+    });
+  }
 
     if(data.dark){
       color = Colors.white;
@@ -891,22 +944,24 @@ class _MapViewState extends State<MapView> {
                       FloatingActionButton(
                         onPressed: ()
                         {
-                          if(_startAddress != '' &&
-                              _destinationAddress != '' &&
-                              (_previousStartAddress != _startAddress ||
-                                  _previousDestinationAddress != _destinationAddress)) {
-                            setState(() {
-                              if (markers.isNotEmpty) markers.clear();
-                              if (polylines.isNotEmpty)
-                                polylines.clear();
-                              if (polylineCoordinates.isNotEmpty)
-                                polylineCoordinates.clear();
-                              _placeDistance = null;
-                            });
+                            if (_startAddress != '' &&
+                                _destinationAddress != '' &&
+                                (_previousStartAddress != _startAddress ||
+                                    _previousDestinationAddress !=
+                                        _destinationAddress)) {
+                              setState(() {
+                                if (markers.isNotEmpty) markers.clear();
+                                if (polylines.isNotEmpty)
+                                  polylines.clear();
+                                if (polylineCoordinates.isNotEmpty)
+                                  polylineCoordinates.clear();
+                                _placeDistance = null;
+                              });
+                              //_calculateDistance();
+                            }
                             _calculateDistance();
-                          }
-                          _previousStartAddress = _startAddress;
-                          _previousDestinationAddress = _destinationAddress;
+                            _previousStartAddress = _startAddress;
+                            _previousDestinationAddress = _destinationAddress;
                           Navigator.of(context).pop();
                         },
                         elevation: 3,
@@ -1012,7 +1067,7 @@ class _MapViewState extends State<MapView> {
                                 Container(
                                   width: 170.0,
                                   child: Text(
-                                    'Red BWM, 4 seats',
+                                    'Red Nissan, 4 seats',
                                     style: TextStyle(
                                         fontSize: 11.0,
                                         fontWeight: FontWeight.w300),

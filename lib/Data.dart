@@ -7,7 +7,7 @@ Future<String> id;
 String id_s;
 Future<User> user;
 
-double radius = 300;
+double radius = 1000;
 
 bool setMarker = false;
 bool isLoggedIn = false;

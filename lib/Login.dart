@@ -68,8 +68,6 @@ class _Login extends State<Login> {
             var login = _loginController.text;
             var password = _passwordController.text;
             data.id = verifyLogin(login, password);
-            
-
             data.id.then((id) {
               if (id != "-1") {
                 data.isLoggedIn = true;
