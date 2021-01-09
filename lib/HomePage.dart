@@ -90,7 +90,7 @@ class _MapViewState extends State<MapView> {
 
 
   Set<Marker> markers = {};
-  final channel = IOWebSocketChannel.connect('ws://hikesocket.herokuapp.com/'); // Muta unde se incepe route
+  IOWebSocketChannel channel;
 
 
   PolylinePoints polylinePoints;
@@ -412,7 +412,12 @@ class _MapViewState extends State<MapView> {
         });
         if(data.isDriver) {
           data.id.then((i) {
-            sendDriverRoute(i, jsonEncode(polylineCoordinates));
+            //sendDriverRoute(i, jsonEncode(polylineCoordinates));
+            channel = IOWebSocketChannel.connect('ws://hikesocket.herokuapp.com/');
+            channel.sink.add(jsonEncode(<String, dynamic>{
+                  'id': i,
+                  "points": polylineCoordinatesTracker,
+                }));
           });
         } else {
           Future<List<dynamic>> drivers = getDrivers(startCoordinates.latitude, startCoordinates.longitude, destinationCoordinates.latitude, destinationCoordinates.longitude, data.radius);
@@ -437,8 +442,8 @@ class _MapViewState extends State<MapView> {
                   },
                   markerId: MarkerId('$i'),
                   position: LatLng(
-                    46.9842,
-                    28.7781
+                    driverList[i].lat,
+                    driverList[i].lng
                   ),
                   icon: carIcon
               );
@@ -598,6 +603,7 @@ class _MapViewState extends State<MapView> {
 
   @override
   void dispose() {
+    channel.sink.close();
     timer?.cancel();
     super.dispose();
   }

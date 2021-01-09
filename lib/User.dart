@@ -9,10 +9,10 @@ class User {
     final String car_id;
     final String carModel = 'Nissan';
     final String plateNumber = 'BOS 496';
-    double lat = 46.0;
-    double lng = 28.0;
+    final double lat;
+    final double lng;
 
-  User({this.id,  this.name, this.surname, this.phone, this.car_id});
+  User({this.id,  this.name, this.surname, this.phone, this.lat, this.lng, this.car_id});
 
   factory User.fromJson(Map<String, dynamic> json){
     return User(
@@ -20,6 +20,8 @@ class User {
       name: json['name'],
       surname: json['surname'],
       phone: json['phone'],
+      lat: json['lat'],
+      lng: json['lng'],
       car_id: json['car_id'],
     );
   }
