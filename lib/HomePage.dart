@@ -15,6 +15,7 @@ import 'package:untitled/DriverDialog.dart';
 import 'Secret.dart';
 import 'Data.dart' as data;
 import 'User.dart';
+import 'package:collection/collection.dart';
 
 import 'dart:math' show cos, sqrt, asin;
 
@@ -34,6 +35,7 @@ class _MapViewState extends State<MapView> {
 
   bool isMapCreated = false;
   var driver = new Driver();
+  var oldDrivers = List<dynamic>();
   final Geolocator _geolocator = Geolocator();
 
   Position _currentPosition;
@@ -450,7 +452,7 @@ class _MapViewState extends State<MapView> {
                   },
                   markerId: MarkerId('$i'),
                   position: loc,
-                   icon: carIcon
+                    icon: carIcon
               );
                 setState(() {
                   showUser = true;
@@ -540,8 +542,8 @@ class _MapViewState extends State<MapView> {
 
   BitmapDescriptor carIcon;
   MapType mapType;
-  
-  
+
+
   @override
   void initState() {
     super.initState();
@@ -622,39 +624,62 @@ class _MapViewState extends State<MapView> {
       if (data.isDriver) {
         polylineCoordinatesTracker.clear();
         _liveTracker();
-    }
-      // else {
-      //   markers.removeWhere((Marker m) => (m.markerId != MarkerId('A') && m.markerId != MarkerId('B')));
-      //   Future<List<dynamic>> drivers = getDrivers(_currentPosition.latitude, _currentPosition.longitude, destinationCoordinates.latitude, destinationCoordinates.longitude, data.radius);
-      //   drivers.then((d) {
-      //       Marker driverMarker = new Marker(
-      //           onTap: () {
-      //             showDialog(
-      //                 context: context,
-      //                 builder: (context) =>
-      //                     DriverDialog(
-      //                         name: driverList[i].name,
-      //                         surname: driverList[i].surname,
-      //                         phone: driverList[i].phone,
-      //                         carModel: driverList[i].carModel,
-      //                         plateNumber: driver.plateNumber)
-      //             );
-      //           },
-      //           markerId: MarkerId('$i'),
-      //           position: LatLng(
-      //               double.parse(driverList[i].lat),
-      //               double.parse(driverList[i].lng)
-      //           ),
-      //           icon: carIcon
-      //       );
-      //
-      //       setState(() {
-      //         showUser = true;
-      //         markers.add(driverMarker);
-      //       });
-      //     }
-      //   });
-      // }
+    } else {
+        markers.removeWhere((Marker m) => (m.markerId != MarkerId('A')) && m.markerId != MarkerId('B'));
+        Future<List<dynamic>> drivers = getDrivers(
+            _currentPosition.latitude, _currentPosition.longitude,
+            destinationCoordinates.latitude, destinationCoordinates.longitude,
+            data.radius);
+        Function eq = const ListEquality().equals;
+        double lat, lng;
+        LatLng loc;
+        bool foo = true;
+        drivers.then((d) {
+          if (eq(oldDrivers, d)) {
+            print("Old == New");
+            foo = false;
+          }
+          else {
+            driverList.clear();
+          }
+          print("Drivers LIST:");
+          print(d);
+          print("--------");
+          for (var i = 0; i < d.length; i++) {
+            Future<User> user = fetchUser(d[i].toString());
+            user.then((u) {
+              if (foo) {
+                driverList.add(u);
+              }
+              lat = driverList[i].lat;
+              lng = driverList[i].lng;
+              loc = LatLng(lat, lng);
+              print(loc);
+              Marker driverMarker = new Marker(
+                  onTap: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) =>
+                            DriverDialog(
+                                name: driverList[i].name,
+                                surname: driverList[i].surname,
+                                phone: driverList[i].phone,
+                                carModel: driverList[i].carModel,
+                                plateNumber: driver.plateNumber)
+                    );
+                  },
+                  markerId: MarkerId('$i'),
+                  position: loc,
+                  icon: carIcon
+              );
+              setState(() {
+                oldDrivers = d;
+                markers.add(driverMarker);
+              });
+            });
+          }
+        });
+      }
     });
   }
 
@@ -798,7 +823,7 @@ class _MapViewState extends State<MapView> {
                   ),
                 ),
               ),
-                
+
                 SafeArea(
                   child: Align(
                     alignment: Alignment.bottomRight,
