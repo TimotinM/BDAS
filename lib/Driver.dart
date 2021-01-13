@@ -19,7 +19,7 @@ class Driver {
 }
 
 
-Future <List<dynamic>> getDrivers(double s_lat, double s_lng, double e_lat, double e_lng, double radius) async {
+Future<List<dynamic>> getDrivers(double s_lat, double s_lng, double e_lat, double e_lng, double radius) async {
   final response = await http.post('https://hitchhikeapi.herokuapp.com/api/passangers',
   headers: <String , String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -35,7 +35,6 @@ Future <List<dynamic>> getDrivers(double s_lat, double s_lng, double e_lat, doub
   );
 
   if (response.statusCode == 200) {
-    print(jsonDecode(response.body));
     return jsonDecode(response.body);
   } else {
     // If the server did not return a 200 OK response,

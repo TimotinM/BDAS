@@ -421,13 +421,21 @@ class _MapViewState extends State<MapView> {
           });
         } else {
           Future<List<dynamic>> drivers = getDrivers(startCoordinates.latitude, startCoordinates.longitude, destinationCoordinates.latitude, destinationCoordinates.longitude, data.radius);
+          double lat, lng;
+          LatLng loc;
           drivers.then((d) {
+            print("Drivers LIST:");
+            print(d);
+            print("--------");
             for(var i = 0; i < d.length; i++){
               Future<User> user = fetchUser(d[i].toString());
               user.then((u) {
                 driverList.add(u);
-              });
-              Marker driverMarker = new Marker(
+                lat = driverList[i].lat;
+                lng = driverList[i].lng;
+                loc = LatLng(lat, lng);
+                print(loc);
+                Marker driverMarker = new Marker(
                   onTap: () {
                     showDialog(
                         context: context,
@@ -441,16 +449,13 @@ class _MapViewState extends State<MapView> {
                     );
                   },
                   markerId: MarkerId('$i'),
-                  position: LatLng(
-                    driverList[i].lat,
-                    driverList[i].lng
-                  ),
-                  icon: carIcon
+                  position: loc,
+                   icon: carIcon
               );
-
-              setState(() {
-                showUser = true;
-                markers.add(driverMarker);
+                setState(() {
+                  showUser = true;
+                  markers.add(driverMarker);
+                });
               });
             }
           });
@@ -612,10 +617,44 @@ class _MapViewState extends State<MapView> {
   @override
   Widget build(BuildContext context) {
 
-  if(_destinationAddress != '' && data.isDriver) {
-    Future.delayed(const Duration(seconds: 3), () {
-      polylineCoordinatesTracker.clear();
-      _liveTracker();
+  if(_destinationAddress != '') {
+    Future.delayed(const Duration(seconds: 5), () {
+      if (data.isDriver) {
+        polylineCoordinatesTracker.clear();
+        _liveTracker();
+    }
+      // else {
+      //   markers.removeWhere((Marker m) => (m.markerId != MarkerId('A') && m.markerId != MarkerId('B')));
+      //   Future<List<dynamic>> drivers = getDrivers(_currentPosition.latitude, _currentPosition.longitude, destinationCoordinates.latitude, destinationCoordinates.longitude, data.radius);
+      //   drivers.then((d) {
+      //       Marker driverMarker = new Marker(
+      //           onTap: () {
+      //             showDialog(
+      //                 context: context,
+      //                 builder: (context) =>
+      //                     DriverDialog(
+      //                         name: driverList[i].name,
+      //                         surname: driverList[i].surname,
+      //                         phone: driverList[i].phone,
+      //                         carModel: driverList[i].carModel,
+      //                         plateNumber: driver.plateNumber)
+      //             );
+      //           },
+      //           markerId: MarkerId('$i'),
+      //           position: LatLng(
+      //               double.parse(driverList[i].lat),
+      //               double.parse(driverList[i].lng)
+      //           ),
+      //           icon: carIcon
+      //       );
+      //
+      //       setState(() {
+      //         showUser = true;
+      //         markers.add(driverMarker);
+      //       });
+      //     }
+      //   });
+      // }
     });
   }
 
@@ -1018,7 +1057,16 @@ class _MapViewState extends State<MapView> {
       },
       child: InkWell(
           onTap: () {
-            // moveCamera();
+            setState(() {
+              mapController.animateCamera(
+                CameraUpdate.newCameraPosition(
+                  CameraPosition(
+                    target: LatLng(driverList[index].lat, driverList[index].lng),
+                    zoom: 15.0,
+                  ),
+                ),
+              );
+            });
           },
           child: Stack(children: [
             Center(
