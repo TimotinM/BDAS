@@ -96,8 +96,9 @@ class DriverDialog extends StatelessWidget {
             FlatButton(
               color: Colors.redAccent,
               onPressed: (){
-              Navigator.of(context).pop();
-            },
+                data.current_driver = '';
+                Navigator.of(context).pop();
+              },
               child: Text('No'),
               textColor: Colors.white
             ),

@@ -297,6 +297,7 @@ class _MapViewState extends State<MapView> {
   // Method for calculating the distance between two places
   Future<bool> _calculateDistance() async {
     notification = true;
+    data.current_driver = '';
     try {
       // Retrieving placemarks from addresses
       List<Placemark> startPlacemark =
