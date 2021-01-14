@@ -97,6 +97,7 @@ class DriverDialog extends StatelessWidget {
               color: Colors.redAccent,
               onPressed: (){
                 data.current_driver = '';
+                data.notification = true;
                 Navigator.of(context).pop();
               },
               child: Text('No'),

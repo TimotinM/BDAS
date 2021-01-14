@@ -16,5 +16,6 @@ bool isDriver = false;
 bool dark = false;
 bool isSatelit = false;
 bool isLive = false;
+bool notification = true;
 
 String current_driver;

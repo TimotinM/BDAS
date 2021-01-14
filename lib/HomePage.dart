@@ -45,7 +45,6 @@ class _MapViewState extends State<MapView> {
   bool tap = false;
   bool showUser = false;
   bool y = false;
-  bool notification = true;
 
   final startAddressController = TextEditingController();
   final destinationAddressController = TextEditingController();
@@ -296,7 +295,7 @@ class _MapViewState extends State<MapView> {
 
   // Method for calculating the distance between two places
   Future<bool> _calculateDistance() async {
-    notification = true;
+    data.notification = true;
     data.current_driver = '';
     try {
       // Retrieving placemarks from addresses
@@ -671,9 +670,9 @@ class _MapViewState extends State<MapView> {
               if (data.current_driver == d[i].toString()) {
                 double distance  = _coordinateDistance(_currentPosition.latitude, _currentPosition.longitude, lat, lng);
                 print(distance);
-                if(distance < 0.2 && notification){
+                if(distance < 0.2 && data.notification){
                   _notification(context);
-                  notification = false;
+                  data.notification = false;
                 }
               }
               loc = LatLng(lat, lng);
