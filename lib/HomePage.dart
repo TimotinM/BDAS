@@ -45,6 +45,7 @@ class _MapViewState extends State<MapView> {
   bool tap = false;
   bool showUser = false;
   bool y = false;
+  bool notification = true;
 
   final startAddressController = TextEditingController();
   final destinationAddressController = TextEditingController();
@@ -407,11 +408,12 @@ class _MapViewState extends State<MapView> {
             polylineCoordinates[i + 1].longitude,
           );
         }
-        driverList.clear();
+
         setState(() {
           _placeDistance = totalDistance.toStringAsFixed(2);
           print('DISTANCE: $_placeDistance km');
         });
+        driverList.clear();
         if(data.isDriver) {
           data.id.then((i) {
             //sendDriverRoute(i, jsonEncode(polylineCoordinates));
@@ -593,7 +595,7 @@ class _MapViewState extends State<MapView> {
       );
     });
     BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(size: Size(50, 50)),
+        ImageConfiguration(size: Size(100, 100)),
         'assets/carMarker.png').then((onValue) {
       carIcon = onValue;
     });
@@ -618,6 +620,17 @@ class _MapViewState extends State<MapView> {
 
   @override
   Widget build(BuildContext context) {
+
+    if(showUser){
+      Future.delayed(const Duration(seconds: 1), () {
+        if(y)
+          showUser = false;
+        setState(() {
+
+        });
+        y = true;
+      });
+    }
 
   if(_destinationAddress != '') {
     Future.delayed(const Duration(seconds: 5), () {
@@ -651,8 +664,16 @@ class _MapViewState extends State<MapView> {
               if (foo) {
                 driverList.add(u);
               }
-              lat = driverList[i].lat;
-              lng = driverList[i].lng;
+              lat = u.lat;
+              lng = u.lng;
+              if (data.current_driver == d[i].toString()) {
+                double distance  = _coordinateDistance(_currentPosition.latitude, _currentPosition.longitude, lat, lng);
+
+                if(distance < 200 && notification){
+                  _notification(context);
+                  notification = false;
+                }
+              }
               loc = LatLng(lat, lng);
               print(loc);
               Marker driverMarker = new Marker(
@@ -661,6 +682,7 @@ class _MapViewState extends State<MapView> {
                         context: context,
                         builder: (context) =>
                             DriverDialog(
+                                id: driverList[i].id,
                                 name: driverList[i].name,
                                 surname: driverList[i].surname,
                                 phone: driverList[i].phone,
@@ -679,6 +701,7 @@ class _MapViewState extends State<MapView> {
             });
           }
         });
+
       }
     });
   }
@@ -690,16 +713,7 @@ class _MapViewState extends State<MapView> {
       color = Colors.black;
       notColor = Colors.white;
     }
-    if(showUser){
-      Future.delayed(const Duration(seconds: 1), () {
-        if(y)
-          showUser = false;
-        setState(() {
 
-        });
-        y = true;
-      });
-    }
 
     if(data.isLive)
       Future.delayed(const Duration(seconds: 3), () {
@@ -787,8 +801,9 @@ class _MapViewState extends State<MapView> {
                     _placeDistance = null;
                     _getEndAddress(tapped);
                     _calculateDistance();
+                    data.setMarker = false;
                     setState(() {
-                      data.setMarker = false;
+
                     });
                   } : null,
                   polylines: Set<Polyline>.of(polylines.values),
@@ -933,8 +948,6 @@ class _MapViewState extends State<MapView> {
                     ),
                   ),
                 ),
-
-
               ],
             ),
             floatingActionButton: FloatingActionButton(
@@ -1011,6 +1024,31 @@ class _MapViewState extends State<MapView> {
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
+                      SafeArea(
+                        child: Align(
+                          alignment: Alignment.bottomLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 2.0, bottom: 0.0),
+                            child: ClipOval(
+                              child: Material(
+                                color: Colors.transparent, // button color
+                                child: InkWell(
+                                  splashColor: Colors.transparent, // inkwell color
+                                  child: SizedBox(
+                                    width: 56,
+                                    height: 56,
+                                    child: Icon(Icons.cancel_outlined, color: Colors.black, size: 35),
+                                  ),
+                                  onTap: () {
+
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.24),
                       FloatingActionButton(
                         onPressed: ()
                         {
@@ -1038,7 +1076,7 @@ class _MapViewState extends State<MapView> {
                         backgroundColor: Colors.black,
                         child: Icon(Icons.arrow_downward_rounded),
                       ),
-                      SizedBox(width: MediaQuery.of(context).size.width * 0.27),
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.29),
                       IconButton(
                         icon: Icon(Icons.settings, color: Colors.black, size: 35),
                         onPressed: (){
@@ -1049,6 +1087,7 @@ class _MapViewState extends State<MapView> {
                           });
                         },
                       ),
+
                     ],
                   ),
                 ],
@@ -1157,6 +1196,23 @@ class _MapViewState extends State<MapView> {
           ])),
     );
   }
+
+  _notification(context) {
+    showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => new AlertDialog(
+          title: new Text("The driver is less than 200 meters away"),
+          actions: [
+            TextButton(
+                onPressed: (){
+                    Navigator.pop(context);
+                },
+                child: Text('OK')
+            )
+          ],
+        )
+    );
+}
   void mapCreated(controller) {
     setState(() {
       mapController = controller;

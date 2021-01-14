@@ -1,14 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'Data.dart' as data;
 
 class DriverDialog extends StatelessWidget {
+  String id;
   String name;
   String surname ;
   String phone;
   String carModel;
   String plateNumber;
-  DriverDialog({this.name, this.surname, this.phone, this.carModel, this.plateNumber});
+  DriverDialog({this.id, this.name, this.surname, this.phone, this.carModel, this.plateNumber});
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -101,7 +103,10 @@ class DriverDialog extends StatelessWidget {
             ),
             SizedBox(width: 8,),
             RaisedButton(
-              onPressed: () => Navigator.of(context).pop(true),
+              onPressed: () {
+                data.current_driver = id;
+                Navigator.of(context).pop(true);
+              },
               child: Text('Yes'),
               color: Colors.white,
               textColor: Colors.redAccent
