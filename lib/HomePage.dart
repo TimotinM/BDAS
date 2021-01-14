@@ -296,6 +296,7 @@ class _MapViewState extends State<MapView> {
 
   // Method for calculating the distance between two places
   Future<bool> _calculateDistance() async {
+    notification = true;
     try {
       // Retrieving placemarks from addresses
       List<Placemark> startPlacemark =
@@ -668,8 +669,8 @@ class _MapViewState extends State<MapView> {
               lng = u.lng;
               if (data.current_driver == d[i].toString()) {
                 double distance  = _coordinateDistance(_currentPosition.latitude, _currentPosition.longitude, lat, lng);
-
-                if(distance < 200 && notification){
+                print(distance);
+                if(distance < 0.2 && notification){
                   _notification(context);
                   notification = false;
                 }
@@ -1065,9 +1066,8 @@ class _MapViewState extends State<MapView> {
                                   polylineCoordinates.clear();
                                 _placeDistance = null;
                               });
-                              //_calculateDistance();
+                              _calculateDistance();
                             }
-                            _calculateDistance();
                             _previousStartAddress = _startAddress;
                             _previousDestinationAddress = _destinationAddress;
                           Navigator.of(context).pop();
