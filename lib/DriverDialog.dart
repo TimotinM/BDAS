@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'Data.dart' as data;
+import 'User.dart';
 
 class DriverDialog extends StatelessWidget {
   String id;
@@ -96,6 +97,7 @@ class DriverDialog extends StatelessWidget {
             FlatButton(
               color: Colors.redAccent,
               onPressed: (){
+                Future<bool> boo = declineDriver(data.id_s);
                 data.current_driver = '';
                 data.notification = true;
                 Navigator.of(context).pop();
@@ -106,6 +108,7 @@ class DriverDialog extends StatelessWidget {
             SizedBox(width: 8,),
             RaisedButton(
               onPressed: () {
+                Future<bool> boo = acceptDriver(data.id_s, id);
                 data.current_driver = id;
                 Navigator.of(context).pop(true);
               },

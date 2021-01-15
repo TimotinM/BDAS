@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:audioplayers/audio_cache.dart';
+import 'package:audioplayers/audioplayers.dart';
+
 import 'Driver.dart';
 import 'dart:math';
 import 'package:web_socket_channel/io.dart';
@@ -46,6 +49,10 @@ class _MapViewState extends State<MapView> {
   bool showUser = false;
   bool y = false;
 
+  void play() async{
+    player = await cache.play('audio/text_notification.mp3');
+  }
+
   final startAddressController = TextEditingController();
   final destinationAddressController = TextEditingController();
 
@@ -56,6 +63,8 @@ class _MapViewState extends State<MapView> {
   String _previousDestinationAddress = '';
   Color color = Colors.black;
   Color notColor = Colors.white;
+  static AudioCache cache = AudioCache();
+  AudioPlayer player;
 
   Timer timer;
   Icon fab;
@@ -92,6 +101,8 @@ class _MapViewState extends State<MapView> {
 
 
   Set<Marker> markers = {};
+  Set<Marker> car_markers = {};
+  Set<Marker> user_markers = {};
   IOWebSocketChannel channel;
 
 
@@ -418,10 +429,12 @@ class _MapViewState extends State<MapView> {
         if(data.isDriver) {
           data.id.then((i) {
             //sendDriverRoute(i, jsonEncode(polylineCoordinates));
-            channel = IOWebSocketChannel.connect('ws://hikesocket.herokuapp.com/');
+            setState(() {
+              channel = IOWebSocketChannel.connect('ws://hikesocket.herokuapp.com/');
+            });
             channel.sink.add(jsonEncode(<String, dynamic>{
                   'id': i,
-                  "points": polylineCoordinatesTracker,
+                  "points": polylineCoordinates,
                 }));
           });
         } else {
@@ -459,7 +472,7 @@ class _MapViewState extends State<MapView> {
               );
                 setState(() {
                   showUser = true;
-                  markers.add(driverMarker);
+                  car_markers.add(driverMarker);
                 });
               });
             }
@@ -544,6 +557,7 @@ class _MapViewState extends State<MapView> {
   }
 
   BitmapDescriptor carIcon;
+  BitmapDescriptor userIcon;
   MapType mapType;
 
 
@@ -600,6 +614,11 @@ class _MapViewState extends State<MapView> {
         'assets/carMarker.png').then((onValue) {
       carIcon = onValue;
     });
+    BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(size: Size(100, 100)),
+        'assets/user-marker.png').then((onValue) {
+      userIcon = onValue;
+    });
     _pageController = PageController(initialPage: 1, viewportFraction: 0.8)
       ..addListener(_onScroll);
   }
@@ -613,7 +632,9 @@ class _MapViewState extends State<MapView> {
 
   @override
   void dispose() {
+    Future<bool> boo = declineDriver(data.id_s);
     channel.sink.close();
+    cancelRoute(data.id_s);
     timer?.cancel();
     super.dispose();
   }
@@ -637,9 +658,33 @@ class _MapViewState extends State<MapView> {
     Future.delayed(const Duration(seconds: 5), () {
       if (data.isDriver) {
         polylineCoordinatesTracker.clear();
+        Future<List<String>> list = checkPassangers(data.id_s);
+        list.then((l){
+          for (int i = 0; i < l.length; i++) {
+            Future<User> user = fetchUser(l[i]);
+            user.then((u) {
+              Marker marker = new Marker(
+                  markerId: MarkerId(u.id),
+                  position: LatLng(u.lat, u.lng),
+                  icon: userIcon
+              );
+              user_markers.add(marker);
+              double distance  = _coordinateDistance(_currentPosition.latitude, _currentPosition.longitude, u.lat, u.lng);
+              if(distance < 0.5 && data.notification){
+                play();
+                _notification(context, "The hitchhiker is less than 500 meters away");
+                data.notification = false;
+              }
+
+            });
+
+          }
+
+        });
         _liveTracker();
+
     } else {
-        markers.removeWhere((Marker m) => (m.markerId != MarkerId('A')) && m.markerId != MarkerId('B'));
+        car_markers.clear();
         Future<List<dynamic>> drivers = getDrivers(
             _currentPosition.latitude, _currentPosition.longitude,
             destinationCoordinates.latitude, destinationCoordinates.longitude,
@@ -670,8 +715,9 @@ class _MapViewState extends State<MapView> {
               if (data.current_driver == d[i].toString()) {
                 double distance  = _coordinateDistance(_currentPosition.latitude, _currentPosition.longitude, lat, lng);
                 print(distance);
-                if(distance < 0.2 && data.notification){
-                  _notification(context);
+                if(distance < 0.5 && data.notification){
+                  play();
+                  _notification(context, "The driver is less than 500 meters away");
                   data.notification = false;
                 }
               }
@@ -697,7 +743,7 @@ class _MapViewState extends State<MapView> {
               );
               setState(() {
                 oldDrivers = d;
-                markers.add(driverMarker);
+                car_markers.add(driverMarker);
               });
             });
           }
@@ -808,7 +854,7 @@ class _MapViewState extends State<MapView> {
                     });
                   } : null,
                   polylines: Set<Polyline>.of(polylines.values),
-                  markers: markers != null ? Set<Marker>.from(markers) : null,
+                  markers: markers != null ? Set<Marker>.from([]..addAll(markers)..addAll(car_markers)..addAll(user_markers)) : null,
                   initialCameraPosition: _initialLocation,
                   myLocationEnabled: true,
                   myLocationButtonEnabled: false,
@@ -1041,7 +1087,16 @@ class _MapViewState extends State<MapView> {
                                     child: Icon(Icons.cancel_outlined, color: Colors.black, size: 35),
                                   ),
                                   onTap: () {
-
+                                    channel.sink.close();
+                                    setState((){
+                                    polylines.clear();
+                                    markers.clear();
+                                    _destinationAddress = '';
+                                    });
+                                    if (data.isDriver) {
+                                    cancelRoute(data.id_s);
+                                    }
+                                    Navigator.of(context).pop();
                                   },
                                 ),
                               ),
@@ -1197,11 +1252,11 @@ class _MapViewState extends State<MapView> {
     );
   }
 
-  _notification(context) {
+  _notification(context, String s) {
     showDialog<String>(
         context: context,
         builder: (BuildContext context) => new AlertDialog(
-          title: new Text("The driver is less than 200 meters away"),
+          title: new Text(s),
           actions: [
             TextButton(
                 onPressed: (){

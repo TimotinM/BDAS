@@ -133,3 +133,23 @@ Future<bool> sendDriverRoute(String id, String json) async {
   body: json
   );
 }
+
+Future<bool> acceptDriver(String driver_id, String user_id) async {
+  final http.Response response = await http.get(
+    'https://hitchhikeapi.herokuapp.com/api/passengers?id=' + user_id + '&driver_id=' + driver_id,
+  );
+  if (response.statusCode == 400) {
+    return false;
+  }
+  return true;
+}
+
+Future<bool> declineDriver(String user_id) async {
+  final http.Response response = await http.delete(
+    'https://hitchhikeapi.herokuapp.com/api/passengers?id=' + user_id,
+  );
+  if (response.statusCode == 400) {
+    return false;
+  }
+  return true;
+}
