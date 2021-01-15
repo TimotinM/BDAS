@@ -108,7 +108,7 @@ class DriverDialog extends StatelessWidget {
             SizedBox(width: 8,),
             RaisedButton(
               onPressed: () {
-                Future<bool> boo = acceptDriver(data.id_s, id);
+                Future<bool> boo = acceptDriver(id, data.id_s);
                 data.current_driver = id;
                 Navigator.of(context).pop(true);
               },

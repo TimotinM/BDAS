@@ -37,6 +37,7 @@ class _MapViewState extends State<MapView> {
   PageController _pageController;
 
   bool isMapCreated = false;
+  bool localPosition = true;
   var driver = new Driver();
   var oldDrivers = List<dynamic>();
   final Geolocator _geolocator = Geolocator();
@@ -168,14 +169,17 @@ class _MapViewState extends State<MapView> {
       setState(() {
         _currentPosition = position;
         print('CURRENT POS: $_currentPosition');
-        mapController.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(
-              target: LatLng(position.latitude, position.longitude),
-              zoom: 10.0,
+        if(localPosition) {
+          mapController.animateCamera(
+            CameraUpdate.newCameraPosition(
+              CameraPosition(
+                target: LatLng(position.latitude, position.longitude),
+                zoom: 15.0,
+              ),
             ),
-          ),
-        );
+          );
+          localPosition = false;
+        }
       });
       await _getAddress();
     }).catchError((e) {
@@ -308,6 +312,9 @@ class _MapViewState extends State<MapView> {
   Future<bool> _calculateDistance() async {
     data.notification = true;
     data.current_driver = '';
+    car_markers.clear();
+    user_markers.clear();
+    Future<bool> boo = declineDriver(data.id_s);
     try {
       // Retrieving placemarks from addresses
       List<Placemark> startPlacemark =
@@ -658,31 +665,38 @@ class _MapViewState extends State<MapView> {
     Future.delayed(const Duration(seconds: 5), () {
       if (data.isDriver) {
         polylineCoordinatesTracker.clear();
-        Future<List<String>> list = checkPassangers(data.id_s);
-        list.then((l){
-          for (int i = 0; i < l.length; i++) {
-            Future<User> user = fetchUser(l[i]);
-            user.then((u) {
-              Marker marker = new Marker(
-                  markerId: MarkerId(u.id),
-                  position: LatLng(u.lat, u.lng),
-                  icon: userIcon
-              );
-              user_markers.add(marker);
-              double distance  = _coordinateDistance(_currentPosition.latitude, _currentPosition.longitude, u.lat, u.lng);
-              if(distance < 0.5 && data.notification){
-                play();
-                _notification(context, "The hitchhiker is less than 500 meters away");
-                data.notification = false;
-              }
-
-            });
-
-          }
-
-        });
-        _liveTracker();
-
+        Future<List<dynamic>> list = checkPassangers(data.id_s);
+          list.then((l) {
+            user_markers.clear();
+            if  (l != null) {
+              print("USERS  LIST ---------");
+            print(l);
+            for (int i = 0; i < l.length; i++) {
+              Future<User> user = fetchUser(l[i].toString());
+              user.then((u) {
+                print(u.id);
+                Marker marker = new Marker(
+                    markerId: MarkerId(u.id),
+                    position: LatLng(u.lat, u.lng),
+                    icon: userIcon
+                );
+                setState((){
+                  user_markers.add(marker);
+                });
+                double distance = _coordinateDistance(
+                    _currentPosition.latitude, _currentPosition.longitude,
+                    u.lat, u.lng);
+                if (distance < 0.5 && data.notification) {
+                  play();
+                  _notification(
+                      context, "The hitchhiker is less than 500 meters away");
+                  data.notification = false;
+                }
+              });
+            }
+            }
+          });
+          _liveTracker();
     } else {
         car_markers.clear();
         Future<List<dynamic>> drivers = getDrivers(
@@ -708,7 +722,9 @@ class _MapViewState extends State<MapView> {
             Future<User> user = fetchUser(d[i].toString());
             user.then((u) {
               if (foo) {
-                driverList.add(u);
+                setState((){
+                  driverList.add(u);
+                });
               }
               lat = u.lat;
               lng = u.lng;
